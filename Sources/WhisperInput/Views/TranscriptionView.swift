@@ -22,7 +22,7 @@ struct TranscriptionView: View {
         .shadow(color: .black.opacity(0.25), radius: 20, y: 6)
         .onAppear(perform: installKeyMonitor)
         .onDisappear(perform: removeKeyMonitor)
-        .onChange(of: appState.recordingState) { _, state in
+        .onChange(of: appState.recordingState) { state in
             if state == .editing { editorFocused = true }
         }
     }
