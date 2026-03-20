@@ -155,7 +155,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if activate {
-            NSApp.activate(ignoringOtherApps: true)
+            if #available(macOS 14, *) { NSApp.activate() }
+            else { NSApp.activate(ignoringOtherApps: true) }
             floatingPanel?.makeKeyAndOrderFront(nil)
         } else {
             floatingPanel?.orderFront(nil)
@@ -248,7 +249,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func openSettings() {
+        // SettingsLink (the SwiftUI-preferred API) is macOS 14+ and only usable
+        // inside a SwiftUI view hierarchy. From an AppKit @objc action such as
+        // this one, sendAction with showSettingsWindow: is the correct approach.
         NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        NSApp.activate(ignoringOtherApps: true)
+        if #available(macOS 14, *) { NSApp.activate() }
+        else { NSApp.activate(ignoringOtherApps: true) }
     }
 }
