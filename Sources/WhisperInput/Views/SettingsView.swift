@@ -2,78 +2,144 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var appState: AppState
-    @State private var apiKeyInput: String = ""
 
-    // Whisper-supported languages (partial list — extend as needed)
-    let languages: [(label: String, code: String)] = [
-        ("Auto-detect", "auto"),
-        ("English", "en"),
-        ("Spanish", "es"),
-        ("French", "fr"),
-        ("German", "de"),
-        ("Italian", "it"),
-        ("Portuguese", "pt"),
-        ("Dutch", "nl"),
-        ("Japanese", "ja"),
-        ("Korean", "ko"),
-        ("Chinese", "zh"),
-        ("Arabic", "ar"),
-        ("Russian", "ru"),
-        ("Hindi", "hi"),
+    // Local copies so the user can cancel unsaved changes
+    @State private var apiKey: String = ""
+    @State private var language: String = "auto"
+    @State private var mode: RecordingMode = .pushToTalk
+    @State private var saved = false
+
+    private let languages: [(label: String, code: String)] = [
+        ("Auto-detect",  "auto"),
+        ("English",      "en"),
+        ("Spanish",      "es"),
+        ("French",       "fr"),
+        ("German",       "de"),
+        ("Italian",      "it"),
+        ("Portuguese",   "pt"),
+        ("Dutch",        "nl"),
+        ("Japanese",     "ja"),
+        ("Korean",       "ko"),
+        ("Chinese",      "zh"),
+        ("Arabic",       "ar"),
+        ("Russian",      "ru"),
+        ("Hindi",        "hi"),
+        ("Turkish",      "tr"),
+        ("Polish",       "pl"),
+        ("Swedish",      "sv"),
+        ("Ukrainian",    "uk"),
     ]
 
     var body: some View {
         Form {
-            Section("API") {
-                SecureField("OpenAI API Key", text: $apiKeyInput)
+
+            // MARK: API Key
+            Section {
+                SecureField("sk-…", text: $apiKey)
                     .textFieldStyle(.roundedBorder)
-                Text("Your key is stored in UserDefaults. For production, use Keychain.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.system(.body, design: .monospaced))
+                HStack(spacing: 4) {
+                    Image(systemName: "info.circle")
+                        .foregroundStyle(.secondary)
+                    Text("Stored in UserDefaults. Move to Keychain for production use.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("OpenAI API Key")
             }
 
-            Section("Language") {
-                Picker("Input language", selection: $appState.selectedLanguage) {
+            // MARK: Recording Mode
+            Section {
+                Picker("Mode", selection: $mode) {
+                    ForEach(RecordingMode.allCases, id: \.self) { m in
+                        Text(m.label).tag(m)
+                    }
+                }
+                .pickerStyle(.radioGroup)
+                Text(mode.hint)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } header: {
+                Text("Input Mode")
+            }
+
+            // MARK: Language
+            Section {
+                Picker("Language", selection: $language) {
                     ForEach(languages, id: \.code) { lang in
                         Text(lang.label).tag(lang.code)
                     }
                 }
                 .pickerStyle(.menu)
-                Text("Setting a specific language improves accuracy and speed.")
+                Text("Specifying a language improves accuracy and reduces latency.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            } header: {
+                Text("Transcription Language")
             }
 
-            Section("Hotkey") {
-                // TODO: Implement hotkey recorder UI
+            // MARK: Hotkey (read-only for now)
+            Section {
                 HStack {
                     Text("Global shortcut")
                     Spacer()
-                    Text("⌥ Space")
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(.quaternary)
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                    keyBadge("⌥ Space")
                 }
-                Text("Hotkey customization coming soon.")
+                Text("Hotkey customisation coming in a future release.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            } header: {
+                Text("Hotkey")
             }
 
+            // MARK: Save
             HStack {
                 Spacer()
-                Button("Save") { saveSettings() }
+                if saved {
+                    Label("Saved", systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                        .font(.system(size: 13, weight: .medium))
+                        .transition(.opacity)
+                }
+                Button("Save") { save() }
                     .buttonStyle(.borderedProminent)
+                    .keyboardShortcut(.return, modifiers: .command)
             }
+            .padding(.top, 4)
         }
         .formStyle(.grouped)
-        .frame(width: 420)
+        .frame(width: 440)
         .padding()
-        .onAppear { apiKeyInput = appState.openAIApiKey }
+        .onAppear(perform: loadFromAppState)
     }
 
-    private func saveSettings() {
-        appState.openAIApiKey = apiKeyInput
+    // MARK: - Helpers
+
+    private func keyBadge(_ label: String) -> some View {
+        Text(label)
+            .font(.system(size: 12, weight: .medium, design: .monospaced))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(.quaternary, in: RoundedRectangle(cornerRadius: 5))
+    }
+
+    private func loadFromAppState() {
+        apiKey   = appState.openAIApiKey
+        language = appState.selectedLanguage
+        mode     = appState.recordingMode
+    }
+
+    private func save() {
+        appState.openAIApiKey    = apiKey
+        appState.selectedLanguage = language
+        appState.recordingMode   = mode
         appState.savePreferences()
+
+        withAnimation { saved = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation { saved = false }
+        }
     }
 }
