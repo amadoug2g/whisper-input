@@ -50,8 +50,11 @@ class AppState: ObservableObject {
 
     // Preferences
     @Published var recordingMode: RecordingMode = .pushToTalk
+    @Published var autoPasteEnabled: Bool = false
     @Published var selectedLanguage: String = "auto"
     @Published var openAIApiKey: String = ""
+    @Published var hotkeyKeyCode: Int = 49      // Space
+    @Published var hotkeyModifiers: Int = 2048  // Carbon optionKey
 
     // Convenience
     var isRecording: Bool    { recordingState == .recording }
@@ -141,7 +144,11 @@ class AppState: ObservableObject {
                 language: selectedLanguage == "auto" ? nil : selectedLanguage
             )
             transcribedText = text
-            recordingState = .editing
+            if autoPasteEnabled {
+                confirmAndPaste()
+            } else {
+                recordingState = .editing
+            }
         } catch {
             errorMessage = error.localizedDescription
             recordingState = .idle
@@ -174,6 +181,11 @@ class AppState: ObservableObject {
            let mode = RecordingMode(rawValue: raw) {
             recordingMode = mode
         }
+        autoPasteEnabled = UserDefaults.standard.bool(forKey: "autoPasteEnabled")
+        let kc = UserDefaults.standard.integer(forKey: "hotkeyKeyCode")
+        if kc > 0 { hotkeyKeyCode = kc }
+        let km = UserDefaults.standard.integer(forKey: "hotkeyModifiers")
+        if km > 0 { hotkeyModifiers = km }
     }
 
     func savePreferences() {
@@ -184,5 +196,8 @@ class AppState: ObservableObject {
         }
         UserDefaults.standard.set(selectedLanguage,       forKey: "selectedLanguage")
         UserDefaults.standard.set(recordingMode.rawValue, forKey: "recordingMode")
+        UserDefaults.standard.set(autoPasteEnabled,       forKey: "autoPasteEnabled")
+        UserDefaults.standard.set(hotkeyKeyCode,          forKey: "hotkeyKeyCode")
+        UserDefaults.standard.set(hotkeyModifiers,        forKey: "hotkeyModifiers")
     }
 }

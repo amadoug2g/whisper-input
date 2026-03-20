@@ -53,6 +53,10 @@ class HotkeyManager {
     ///   - keyCode: Virtual key code (default 49 = Space).
     ///   - modifiers: Carbon modifier flags (default optionKey).
     func register(keyCode: UInt32 = 49, modifiers: UInt32 = UInt32(optionKey)) {
+        // Clean up any existing registration before re-registering
+        if let ref = hotkeyRef { UnregisterEventHotKey(ref); hotkeyRef = nil }
+        if let ref = handlerRef { RemoveEventHandler(ref); handlerRef = nil }
+
         // Listen for both key-down and key-up
         var eventTypes = [
             EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed)),

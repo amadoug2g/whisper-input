@@ -19,6 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var previousApp: NSRunningApplication?
 
     private var stateCancellable: AnyCancellable?
+    private var hotkeySettingsCancellable: AnyCancellable?
 
     // MARK: - Launch
 
@@ -50,7 +51,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self?.handleHotkeyUp()
         }
 
-        hotkeyManager?.register() // default: ⌥ Space
+        hotkeyManager?.register(keyCode: UInt32(appState.hotkeyKeyCode),
+                                modifiers: UInt32(appState.hotkeyModifiers))
+
+        hotkeySettingsCancellable = Publishers.CombineLatest(
+            appState.$hotkeyKeyCode,
+            appState.$hotkeyModifiers
+        )
+        .dropFirst()
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] keyCode, modifiers in
+            self?.hotkeyManager?.register(keyCode: UInt32(keyCode),
+                                          modifiers: UInt32(modifiers))
+        }
     }
 
     private func handleHotkeyDown() {
@@ -132,12 +145,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func buildPanel() -> NSPanel {
-        let panel = NSPanel(
+        let panel = FloatingPanel(
             contentRect: NSRect(x: 0, y: 0, width: 480, height: 120),
             styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
+        panel.appState = appState
         panel.isFloatingPanel = true
         panel.level = .floating
         panel.isOpaque = false
@@ -206,5 +220,38 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             capturePreviousApp()
             appState.startRecording()
         }
+    }
+}
+
+// MARK: - FloatingPanel
+
+/// NSPanel subclass that handles ⌘↩ and Escape directly at the window level,
+/// bypassing NSTextView's responder chain so the shortcuts always fire.
+private final class FloatingPanel: NSPanel {
+    weak var appState: AppState?
+
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { false }
+
+    /// Called before the event is dispatched to any view — reliable for key equivalents.
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        guard event.type == .keyDown,
+              event.keyCode == 36,                          // Return
+              event.modifierFlags.contains(.command) else { // ⌘
+            return super.performKeyEquivalent(with: event)
+        }
+        return MainActor.assumeIsolated {
+            guard let state = appState,
+                  state.isEditing,
+                  !state.transcribedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            else { return super.performKeyEquivalent(with: event) }
+            state.confirmAndPaste()
+            return true
+        }
+    }
+
+    /// Standard AppKit hook for Escape — more reliable than a local event monitor.
+    override func cancelOperation(_ sender: Any?) {
+        MainActor.assumeIsolated { appState?.reset() }
     }
 }

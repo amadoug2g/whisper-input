@@ -29,6 +29,7 @@ private struct OpenAIErrorResponse: Decodable {
 
 class WhisperService {
     private let endpoint = URL(string: "https://api.openai.com/v1/audio/transcriptions")!
+    private let session = URLSession(configuration: .ephemeral)
 
     /// Transcribes an audio file using OpenAI's transcription API.
     /// - Parameters:
@@ -46,6 +47,7 @@ class WhisperService {
 
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
+        request.timeoutInterval = 30
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.httpBody = buildMultipartBody(
@@ -55,7 +57,7 @@ class WhisperService {
             boundary: boundary
         )
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await session.data(for: request)
 
         if let http = response as? HTTPURLResponse, http.statusCode != 200 {
             throw WhisperError.httpError(http.statusCode, String(data: data, encoding: .utf8) ?? "")
