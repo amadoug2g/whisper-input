@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+*.swp
+*.swo
+
+# Xcode
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+DerivedData/
+build/
+*.moved-aside
+xcuserdata/
+*.xccheckout
+*.xcscmblueprint
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Environment / secrets
+.env
+*.env.local
+Config.xcconfig
+
+# CocoaPods (if ever added)
+Pods/
+Podfile.lock
