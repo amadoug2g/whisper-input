@@ -39,9 +39,9 @@ struct SettingsView: View {
                     .textFieldStyle(.roundedBorder)
                     .font(.system(.body, design: .monospaced))
                 HStack(spacing: 4) {
-                    Image(systemName: "info.circle")
+                    Image(systemName: "lock.fill")
                         .foregroundStyle(.secondary)
-                    Text("Stored in UserDefaults. Move to Keychain for production use.")
+                    Text("Stored securely in the system Keychain.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

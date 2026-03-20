@@ -8,6 +8,15 @@ enum RecordingState: Equatable {
     case recording
     case transcribing
     case editing
+
+    var menuBarIconName: String {
+        switch self {
+        case .idle:         return "mic.circle"
+        case .recording:    return "mic.circle.fill"
+        case .transcribing: return "waveform.circle"
+        case .editing:      return "checkmark.circle"
+        }
+    }
 }
 
 enum RecordingMode: String, CaseIterable {
@@ -159,7 +168,7 @@ class AppState: ObservableObject {
     // MARK: - Preferences
 
     private func loadPreferences() {
-        openAIApiKey    = UserDefaults.standard.string(forKey: "openAIApiKey")    ?? ""
+        openAIApiKey     = KeychainService.load(forKey: "openAIApiKey") ?? ""
         selectedLanguage = UserDefaults.standard.string(forKey: "selectedLanguage") ?? "auto"
         if let raw = UserDefaults.standard.string(forKey: "recordingMode"),
            let mode = RecordingMode(rawValue: raw) {
@@ -168,8 +177,12 @@ class AppState: ObservableObject {
     }
 
     func savePreferences() {
-        UserDefaults.standard.set(openAIApiKey,     forKey: "openAIApiKey")
-        UserDefaults.standard.set(selectedLanguage,  forKey: "selectedLanguage")
+        if openAIApiKey.isEmpty {
+            KeychainService.delete(forKey: "openAIApiKey")
+        } else {
+            KeychainService.save(openAIApiKey, forKey: "openAIApiKey")
+        }
+        UserDefaults.standard.set(selectedLanguage,       forKey: "selectedLanguage")
         UserDefaults.standard.set(recordingMode.rawValue, forKey: "recordingMode")
     }
 }

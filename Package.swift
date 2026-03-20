@@ -6,14 +6,22 @@ let package = Package(
     platforms: [
         .macOS(.v13)
     ],
-    dependencies: [],
     targets: [
-        .executableTarget(
+        // All app logic as a library so tests can import it.
+        .target(
             name: "WhisperInput",
-            path: "Sources/WhisperInput",
-            swiftSettings: [
-                .unsafeFlags(["-parse-as-library"])
-            ]
+            path: "Sources/WhisperInput"
+        ),
+        // Thin entry point — calls WhisperInputApp.main().
+        .executableTarget(
+            name: "WhisperInputMain",
+            dependencies: ["WhisperInput"],
+            path: "Sources/WhisperInputMain"
+        ),
+        .testTarget(
+            name: "WhisperInputTests",
+            dependencies: ["WhisperInput"],
+            path: "Tests/WhisperInputTests"
         )
     ]
 )

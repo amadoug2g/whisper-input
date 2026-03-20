@@ -8,7 +8,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Properties
 
     let appState = AppState()
-    private var statusItem: NSStatusItem?
+    /// Initialized lazily so appState is guaranteed to exist first.
+    lazy var menuBarState = MenuBarState(appState: appState)
     private var floatingPanel: NSPanel?
     private var hotkeyManager: HotkeyManager?
     private let pasteService = PasteService()
@@ -24,44 +25,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory) // menubar-only, no Dock icon
 
-        setupMenuBar()
+        requestAccessibilityIfNeeded()
         setupHotkey()
         setupPasteHandler()
         observeRecordingState()
     }
 
-    // MARK: - Menubar
-
-    private func setupMenuBar() {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        guard let button = statusItem?.button else { return }
-        button.image = NSImage(systemSymbolName: "mic.circle", accessibilityDescription: "WhisperInput")
-        button.target = self
-        button.action = #selector(statusBarButtonClicked)
-    }
-
-    @objc private func statusBarButtonClicked() {
-        let menu = NSMenu()
-
-        let modeItem = NSMenuItem(
-            title: "Mode: \(appState.recordingMode.label)",
-            action: nil,
-            keyEquivalent: ""
-        )
-        modeItem.isEnabled = false
-        menu.addItem(modeItem)
-        menu.addItem(.separator())
-
-        let recordTitle = appState.isRecording ? "Stop Recording" : "Start Recording  (⌥ Space)"
-        menu.addItem(NSMenuItem(title: recordTitle, action: #selector(menuToggleRecording), keyEquivalent: ""))
-        menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Settings…", action: #selector(openSettings), keyEquivalent: ","))
-        menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
-
-        statusItem?.menu = menu
-        statusItem?.button?.performClick(nil)
-        statusItem?.menu = nil
+    /// Prompts the user to grant Accessibility access if not already granted.
+    /// CGEvent-based text injection (PasteService) requires this permission.
+    private func requestAccessibilityIfNeeded() {
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+        AXIsProcessTrustedWithOptions(options as CFDictionary)
     }
 
     // MARK: - Hotkey wiring
@@ -107,29 +81,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         appState.stopRecording()
     }
 
-    // MARK: - State observation → panel lifecycle + menubar icon
+    // MARK: - State observation → panel lifecycle
 
     private func observeRecordingState() {
         stateCancellable = appState.$recordingState
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
-                self?.updateMenuBarIcon(for: state)
                 self?.updatePanel(for: state)
             }
-    }
-
-    private func updateMenuBarIcon(for state: RecordingState) {
-        let name: String
-        switch state {
-        case .idle:         name = "mic.circle"
-        case .recording:    name = "mic.circle.fill"
-        case .transcribing: name = "waveform.circle"
-        case .editing:      name = "checkmark.circle"
-        }
-        statusItem?.button?.image = NSImage(
-            systemSymbolName: name,
-            accessibilityDescription: "WhisperInput"
-        )
     }
 
     private func updatePanel(for state: RecordingState) {
@@ -239,21 +198,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         previousApp = NSWorkspace.shared.frontmostApplication
     }
 
-    @objc private func menuToggleRecording() {
+    /// Called by the SwiftUI menu bar to toggle recording.
+    func menuToggleRecording() {
         if appState.isRecording {
             appState.stopRecording()
         } else if appState.recordingState == .idle {
             capturePreviousApp()
             appState.startRecording()
         }
-    }
-
-    @objc private func openSettings() {
-        // SettingsLink (the SwiftUI-preferred API) is macOS 14+ and only usable
-        // inside a SwiftUI view hierarchy. From an AppKit @objc action such as
-        // this one, sendAction with showSettingsWindow: is the correct approach.
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        if #available(macOS 14, *) { NSApp.activate() }
-        else { NSApp.activate(ignoringOtherApps: true) }
     }
 }
