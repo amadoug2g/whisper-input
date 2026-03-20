@@ -1,5 +1,15 @@
+import AppKit
 import Foundation
 import Combine
+
+// MARK: - Protocols
+
+/// Implemented by the coordinator that owns `PasteService` and the previous-app reference.
+/// Breaks the circular dependency between `AppState` and `AppDelegate`.
+@MainActor
+protocol PasteOrchestrating: AnyObject {
+    func orchestratePaste(_ text: String)
+}
 
 // MARK: - State types
 
@@ -8,15 +18,7 @@ enum RecordingState: Equatable {
     case recording
     case transcribing
     case editing
-
-    var menuBarIconName: String {
-        switch self {
-        case .idle:         return "mic.circle"
-        case .recording:    return "mic.circle.fill"
-        case .transcribing: return "waveform.circle"
-        case .editing:      return "checkmark.circle"
-        }
-    }
+    case error(String)
 }
 
 enum RecordingMode: String, CaseIterable {
@@ -45,65 +47,81 @@ class AppState: ObservableObject {
     // Recording / transcription
     @Published var recordingState: RecordingState = .idle
     @Published var transcribedText: String = ""
-    @Published var errorMessage: String? = nil
-    @Published var audioLevel: Float = 0.0   // [0, 1], updated while recording
+    @Published var audioLevel: Float = 0.0
 
     // Preferences
     @Published var recordingMode: RecordingMode = .pushToTalk
     @Published var selectedLanguage: String = "auto"
     @Published var openAIApiKey: String = ""
 
+    // App status
+    @Published var hotkeyConflict: Bool = false
+
     // Convenience
     var isRecording: Bool    { recordingState == .recording }
     var isTranscribing: Bool { recordingState == .transcribing }
     var isEditing: Bool      { recordingState == .editing }
+    var needsSetup: Bool     { openAIApiKey.trimmingCharacters(in: .whitespaces).isEmpty }
 
-    /// Injected by AppDelegate: hides the panel, re-activates the previous app,
-    /// then calls PasteService.typeText(_:).
-    var pasteHandler: ((String) -> Void)?
+    /// Wired by the coordinator (AppDelegate) after init to break circular dependency.
+    weak var pasteOrchestrator: PasteOrchestrating?
 
-    // Private services
-    private let audioRecorder = AudioRecorder()
-    private let whisperService = WhisperService()
+    // Private services — injected for testability
+    private let audioRecorder: any AudioRecording
+    private let transcriber: any Transcribing
+    var recordingStartedAt: Date?
 
-    init() {
-        loadPreferences()
+    init(
+        audioRecorder: any AudioRecording = AudioRecorder(),
+        transcriber: any Transcribing = WhisperService()
+    ) {
+        self.audioRecorder = audioRecorder
+        self.transcriber = transcriber
 
-        // Forward audio level updates onto the main thread @Published property.
-        audioRecorder.onLevelUpdate = { [weak self] level in
-            Task { @MainActor [weak self] in
-                self?.audioLevel = level
-            }
+        // Load UserDefaults synchronously — fast (< 1ms), needed before first render.
+        let prefs = PreferencesStore.loadFast()
+        selectedLanguage = prefs.language
+        recordingMode = prefs.recordingMode
+
+        // The level timer fires on the main RunLoop (scheduled from @MainActor context),
+        // so assumeIsolated is safe and avoids a Task allocation every 50ms.
+        self.audioRecorder.onLevelUpdate = { [weak self] level in
+            MainActor.assumeIsolated { self?.audioLevel = level }
         }
-    }
 
-    // MARK: - Permissions
-
-    nonisolated func requestMicrophonePermission(completion: @escaping (Bool) -> Void) {
-        AudioRecorder.requestPermission(completion: completion)
+        // Keychain reads block for 10–50ms — defer past the first rendered frame.
+        Task { @MainActor [weak self] in
+            self?.openAIApiKey = KeychainService.load(forKey: "openAIApiKey") ?? ""
+        }
     }
 
     // MARK: - Recording lifecycle
 
     func startRecording() {
         guard recordingState == .idle else { return }
-        errorMessage = nil
 
-        AudioRecorder.requestPermission { [weak self] granted in
+        audioRecorder.requestPermission { [weak self] granted in
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 guard self.recordingState == .idle else { return }
 
                 guard granted else {
-                    self.errorMessage = "Microphone access denied. Enable it in System Settings › Privacy & Security › Microphone."
+                    self.transition(to: .error("Microphone access denied — open System Settings › Privacy & Security › Microphone to allow access."))
+                    self.announce("Microphone access denied")
                     return
                 }
 
                 do {
+                    // Pre-warms the recorder (allocates codec buffers) so .record() is near-instant.
+                    // On second+ recordings this is a no-op since we re-warm after each stop.
+                    self.audioRecorder.prepareToRecord()
                     try self.audioRecorder.startRecording()
-                    self.recordingState = .recording
+                    self.recordingStartedAt = Date()
+                    self.transition(to: .recording)
+                    self.announce("Recording started")
                 } catch {
-                    self.errorMessage = error.localizedDescription
+                    self.transition(to: .error(error.localizedDescription))
+                    self.announce(error.localizedDescription)
                 }
             }
         }
@@ -111,17 +129,32 @@ class AppState: ObservableObject {
 
     func stopRecording() {
         guard recordingState == .recording else { return }
-        recordingState = .transcribing
-        audioLevel = 0
 
-        audioRecorder.stopRecording { [weak self] url in
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                guard let url else {
-                    self.recordingState = .idle
-                    return
-                }
-                await self.transcribe(audioURL: url)
+        // Discard accidental taps shorter than 500 ms
+        if let startedAt = recordingStartedAt,
+           Date().timeIntervalSince(startedAt) < 0.5 {
+            audioRecorder.cancelRecording()
+            audioRecorder.prepareToRecord()   // re-warm for next attempt
+            recordingStartedAt = nil
+            transition(to: .idle)
+            return
+        }
+        recordingStartedAt = nil
+        transition(to: .transcribing)
+        audioLevel = 0
+        announce("Transcribing audio")
+
+        Task {
+            do {
+                let url = try await audioRecorder.stopRecording()
+                // Re-warm immediately so the next recording starts instantly.
+                // Runs concurrently with transcription — user is reviewing text
+                // by the time they press the hotkey again.
+                audioRecorder.prepareToRecord()
+                await transcribe(audioURL: url)
+            } catch {
+                transition(to: .error(error.localizedDescription))
+                announce(error.localizedDescription)
             }
         }
     }
@@ -129,22 +162,20 @@ class AppState: ObservableObject {
     // MARK: - Transcription
 
     private func transcribe(audioURL: URL) async {
-        defer {
-            // Always clean up the temp audio file
-            try? FileManager.default.removeItem(at: audioURL)
-        }
+        defer { try? FileManager.default.removeItem(at: audioURL) }
 
         do {
-            let text = try await whisperService.transcribe(
+            let text = try await transcriber.transcribe(
                 audioURL: audioURL,
                 apiKey: openAIApiKey,
                 language: selectedLanguage == "auto" ? nil : selectedLanguage
             )
             transcribedText = text
-            recordingState = .editing
+            transition(to: .editing)
+            announce("Transcription ready for review")
         } catch {
-            errorMessage = error.localizedDescription
-            recordingState = .idle
+            transition(to: .error(error.localizedDescription))
+            announce(error.localizedDescription)
         }
     }
 
@@ -153,36 +184,75 @@ class AppState: ObservableObject {
     func confirmAndPaste() {
         let text = transcribedText
         reset()
-        pasteHandler?(text)
+        pasteOrchestrator?.orchestratePaste(text)
     }
 
     // MARK: - Reset
 
     func reset() {
         transcribedText = ""
-        errorMessage = nil
-        recordingState = .idle
+        transition(to: .idle)
         audioLevel = 0
+        recordingStartedAt = nil
     }
 
     // MARK: - Preferences
 
-    private func loadPreferences() {
-        openAIApiKey     = KeychainService.load(forKey: "openAIApiKey") ?? ""
-        selectedLanguage = UserDefaults.standard.string(forKey: "selectedLanguage") ?? "auto"
-        if let raw = UserDefaults.standard.string(forKey: "recordingMode"),
-           let mode = RecordingMode(rawValue: raw) {
-            recordingMode = mode
+    /// Saves preferences. Returns `false` if the Keychain write fails.
+    @discardableResult
+    func savePreferences() -> Bool {
+        PreferencesStore(
+            apiKey: openAIApiKey,
+            language: selectedLanguage,
+            recordingMode: recordingMode
+        ).save()
+    }
+
+    // MARK: - State machine
+
+    private func transition(to newState: RecordingState) {
+        #if DEBUG
+        assertValidTransition(from: recordingState, to: newState)
+        #endif
+        recordingState = newState
+        if case .error = newState { scheduleErrorAutoDismissal() }
+    }
+
+    private func scheduleErrorAutoDismissal() {
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(4))
+            guard let self, case .error = self.recordingState else { return }
+            self.reset()
         }
     }
 
-    func savePreferences() {
-        if openAIApiKey.isEmpty {
-            KeychainService.delete(forKey: "openAIApiKey")
-        } else {
-            KeychainService.save(openAIApiKey, forKey: "openAIApiKey")
+    #if DEBUG
+    private func assertValidTransition(from: RecordingState, to: RecordingState) {
+        let valid: Bool
+        switch (from, to) {
+        case (.idle, .recording),
+             (.idle, .error),          // permission denied on start
+             (.recording, .transcribing),
+             (.recording, .idle),      // min-duration cancel
+             (.recording, .error),
+             (.transcribing, .editing),
+             (.transcribing, .error),
+             (_, .idle):               // reset() from any state
+            valid = true
+        default:
+            valid = false
         }
-        UserDefaults.standard.set(selectedLanguage,       forKey: "selectedLanguage")
-        UserDefaults.standard.set(recordingMode.rawValue, forKey: "recordingMode")
+        assert(valid, "Invalid state transition: \(from) → \(to)")
+    }
+    #endif
+
+    // MARK: - Accessibility
+
+    private func announce(_ message: String) {
+        NSAccessibility.post(
+            element: NSApp as AnyObject,
+            notification: .announcementRequested,
+            userInfo: [.announcement: message, .priority: NSAccessibilityPriorityLevel.high]
+        )
     }
 }

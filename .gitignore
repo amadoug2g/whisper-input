@@ -25,3 +25,11 @@ Config.xcconfig
 # CocoaPods (if ever added)
 Pods/
 Podfile.lock
+
+# Claude Code
+.claude/
+
+# App bundle build artifacts (Info.plist is tracked; binaries/resources are not)
+WhisperInput.app/Contents/MacOS/
+WhisperInput.app/Contents/Resources/
+WhisperInput.app/Contents/_CodeSignature/

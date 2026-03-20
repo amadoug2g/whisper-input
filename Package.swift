@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "WhisperInput",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v13)
     ],
@@ -10,7 +11,10 @@ let package = Package(
         // All app logic as a library so tests can import it.
         .target(
             name: "WhisperInput",
-            path: "Sources/WhisperInput"
+            path: "Sources/WhisperInput",
+            resources: [
+                .process("Resources"),
+            ]
         ),
         // Thin entry point — calls WhisperInputApp.main().
         .executableTarget(

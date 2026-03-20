@@ -1,5 +1,15 @@
 import Foundation
 
+// MARK: - Protocol
+
+/// Abstracts the transcription service for testability.
+/// Injected into `AppState` at init time.
+protocol Transcribing: AnyObject {
+    func transcribe(audioURL: URL, apiKey: String, language: String?) async throws -> String
+}
+
+// MARK: - Errors
+
 enum WhisperError: LocalizedError {
     case missingAPIKey
     case httpError(Int, String)
@@ -27,8 +37,17 @@ private struct OpenAIErrorResponse: Decodable {
     let error: ErrorBody
 }
 
-class WhisperService {
+class WhisperService: Transcribing {
     private let endpoint = URL(string: "https://api.openai.com/v1/audio/transcriptions")!
+
+    /// Ephemeral session — no disk cache, no persistent credential storage.
+    /// Transcription responses (user's spoken words) should leave no disk trace.
+    private let session: URLSession = {
+        let config = URLSessionConfiguration.ephemeral
+        config.timeoutIntervalForRequest  = 30   // fail fast per-request
+        config.timeoutIntervalForResource = 90   // allow for large uploads
+        return URLSession(configuration: config)
+    }()
 
     /// Transcribes an audio file using OpenAI's transcription API.
     /// - Parameters:
@@ -46,6 +65,7 @@ class WhisperService {
 
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
+        request.timeoutInterval = 30   // fail fast on slow connections; Whisper is typically < 5s
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.httpBody = buildMultipartBody(
@@ -55,7 +75,7 @@ class WhisperService {
             boundary: boundary
         )
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await session.data(for: request)
 
         if let http = response as? HTTPURLResponse, http.statusCode != 200 {
             throw WhisperError.httpError(http.statusCode, String(data: data, encoding: .utf8) ?? "")

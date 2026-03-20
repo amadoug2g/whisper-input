@@ -48,12 +48,10 @@ class HotkeyManager {
 
     // MARK: - Registration
 
-    /// Registers the global hotkey.
-    /// - Parameters:
-    ///   - keyCode: Virtual key code (default 49 = Space).
-    ///   - modifiers: Carbon modifier flags (default optionKey).
-    func register(keyCode: UInt32 = 49, modifiers: UInt32 = UInt32(optionKey)) {
-        // Listen for both key-down and key-up
+    /// Registers the global hotkey. Returns `true` if registration succeeded.
+    /// A `false` return means another app has already claimed this key combination.
+    @discardableResult
+    func register(keyCode: UInt32 = 49, modifiers: UInt32 = UInt32(optionKey)) -> Bool {
         var eventTypes = [
             EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed)),
             EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyReleased)),
@@ -69,7 +67,8 @@ class HotkeyManager {
         )
 
         let hotKeyID = EventHotKeyID(signature: fourCharCode("WISP"), id: 1)
-        RegisterEventHotKey(keyCode, modifiers, hotKeyID, GetApplicationEventTarget(), 0, &hotkeyRef)
+        let status = RegisterEventHotKey(keyCode, modifiers, hotKeyID, GetApplicationEventTarget(), 0, &hotkeyRef)
+        return status == noErr
     }
 
     // MARK: - Internal handlers (called from the C callback on the main queue)
