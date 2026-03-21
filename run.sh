@@ -6,6 +6,10 @@
 # which means the permission survives rebuilds. Ad-hoc signing creates
 # a new code identity on every build, invalidating the permission each time.
 #
+# NOTE: Unsigned apps CANNOT launch from /Applications (macOS blocks them
+# with "Launchd job spawn failed", POSIX error 163). Dev builds launch
+# from the project directory instead.
+#
 # Run: chmod +x run.sh && ./run.sh
 
 set -euo pipefail
@@ -13,8 +17,6 @@ set -euo pipefail
 APP_NAME="Memo"
 BUNDLE="${APP_NAME}.app"
 BINARY_SRC=".build/debug/MemoMain"
-INSTALL_DIR="/Applications"
-INSTALLED="${INSTALL_DIR}/${BUNDLE}"
 
 echo "Building…"
 swift build 2>&1
@@ -62,29 +64,19 @@ cat > "$BUNDLE/Contents/Info.plist" << 'PLIST'
 PLIST
 fi
 
-# Strip any existing code signature so macOS tracks by path.
+# Strip any existing code signature so macOS tracks Accessibility by path.
+# This means permission persists across rebuilds without re-granting.
 codesign --remove-signature "$BUNDLE" 2>/dev/null || true
 
-# Install to /Applications — remove old copy first to avoid cp -r nesting bug.
-echo "Installing to ${INSTALLED}…"
-rm -rf "$INSTALLED" 2>/dev/null || true
-cp -r "$BUNDLE" "$INSTALLED" 2>/dev/null || {
-    echo "  (Could not copy to /Applications — running from project directory)"
-    INSTALLED="$BUNDLE"
-}
-
-# Clear macOS Launch Services cache so the new binary is picked up.
-/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$INSTALLED" 2>/dev/null || true
-
 echo "Launching…"
-open "$INSTALLED"
+open "$BUNDLE"
 
 echo ""
 echo "Done. Look for the mic icon in your menu bar."
 echo ""
 echo "First run:"
-echo "  1. Open System Settings › Privacy & Security › Accessibility"
-echo "  2. Ensure Memo.app is in the list and toggled ON"
-echo "  3. Click the mic icon → Settings → paste your OpenAI API key → Done"
-echo "  4. Hold ⌥ Space to record. Release to transcribe."
-echo "  5. On first paste, grant Accessibility if prompted (persists across rebuilds)"
+echo "  1. Hold ⌥ Space to record — you should see a tiny waveform pill."
+echo "  2. Release to transcribe."
+echo "  3. On first paste, grant Accessibility when prompted (persists across rebuilds)."
+echo ""
+echo "Settings: click the mic icon in the menu bar → Settings."
