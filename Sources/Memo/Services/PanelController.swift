@@ -56,8 +56,9 @@ final class PanelController {
     }
 
     private func buildPanel() -> FloatingPanel {
+        // Start with minimal size — will be resized in positionPanel()
         let panel = FloatingPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 120),
+            contentRect: NSRect(x: 0, y: 0, width: 120, height: 40),
             styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
             backing: .buffered,
             defer: false
@@ -81,14 +82,18 @@ final class PanelController {
     private func positionPanel(compact: Bool) {
         guard let panel = panel, let screen = NSScreen.main else { return }
         let sf = screen.visibleFrame
-        // Compact pill: small, centered near the bottom of the screen.
-        // Full panel: wider, slightly higher so the editor is comfortable.
-        let contentSize = panel.contentView?.fittingSize ?? NSSize(width: 100, height: 40)
-        let w = compact ? max(contentSize.width, 80) : 400
-        let h = compact ? max(contentSize.height, 36) : panel.frame.height
-        panel.setContentSize(NSSize(width: w, height: h))
+
+        // Set size based on state
+        if compact {
+            // Recording/transcribing: tiny pill with just waveform
+            panel.setContentSize(NSSize(width: 140, height: 32))
+        } else {
+            // Editing/error: wider panel for text + buttons
+            panel.setContentSize(NSSize(width: 400, height: 280))
+        }
+
         let x = sf.midX - panel.frame.width / 2
-        let y = sf.minY + (compact ? 36 : 48)
+        let y = sf.minY + (compact ? 40 : 48)
         panel.setFrameOrigin(NSPoint(x: x, y: y))
     }
 
