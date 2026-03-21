@@ -117,7 +117,7 @@ struct SettingsView: View {
                 Text("Hotkey")
             }
 
-            // MARK: Save
+            // MARK: Save / Done
             HStack {
                 Spacer()
                 if saveFailed {
@@ -132,15 +132,21 @@ struct SettingsView: View {
                         .transition(.opacity)
                 }
                 Button("Save") { save() }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.bordered)
                     .keyboardShortcut(.return, modifiers: .command)
+                Button("Done") { saveAndClose() }
+                    .buttonStyle(.borderedProminent)
+                    .keyboardShortcut("w", modifiers: .command)
             }
             .padding(.top, 4)
         }
         .formStyle(.grouped)
         .frame(minWidth: 440, maxWidth: 440, minHeight: 360)
         .padding()
-        .onAppear(perform: loadFromAppState)
+        .onAppear {
+            loadFromAppState()
+            bringToFront()
+        }
     }
 
     // MARK: - Key test result badge
@@ -176,6 +182,39 @@ struct SettingsView: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(.quaternary, in: RoundedRectangle(cornerRadius: 5))
+    }
+
+    private func bringToFront() {
+        // Accessory apps don't activate automatically — force it so the
+        // settings window appears in front of everything else.
+        if #available(macOS 14, *) { NSApp.activate() }
+        else { NSApp.activate(ignoringOtherApps: true) }
+
+        // Reposition to the screen containing the cursor (in case the user
+        // has multiple monitors and the window opens on the wrong one).
+        DispatchQueue.main.async {
+            guard let window = NSApp.keyWindow else { return }
+            let mouse = NSEvent.mouseLocation
+            let targetScreen = NSScreen.screens.first { $0.frame.contains(mouse) } ?? NSScreen.main
+            guard let screen = targetScreen, window.screen != screen else {
+                window.makeKeyAndOrderFront(nil)
+                return
+            }
+            let sf = screen.visibleFrame
+            let origin = NSPoint(
+                x: sf.midX - window.frame.width / 2,
+                y: sf.midY - window.frame.height / 2
+            )
+            window.setFrameOrigin(origin)
+            window.makeKeyAndOrderFront(nil)
+        }
+    }
+
+    private func saveAndClose() {
+        save()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            NSApp.keyWindow?.close()
+        }
     }
 
     private func loadFromAppState() {
