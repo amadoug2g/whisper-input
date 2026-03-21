@@ -22,25 +22,15 @@ private func carbonHotkeyHandler(
 // MARK: -
 
 /// Registers a global hotkey via the Carbon Event Manager.
-///
-/// Supports two interaction models driven by the app layer:
-///   - **Push-to-talk**: caller starts recording in `onKeyDown`, stops in `onKeyUp`.
-///   - **Toggle**: caller uses `onKeyDown` to start/stop; `onKeyUp` is ignored.
-///
-/// - Note: Requires the app to be **non-sandboxed** or to hold the Accessibility permission
-///   (System Settings › Privacy & Security › Accessibility).
 class HotkeyManager {
-    // Callbacks set by AppDelegate
     var onKeyDown: (() -> Void)?
     var onKeyUp: (() -> Void)?
 
     private var hotkeyRef: EventHotKeyRef?
     private var handlerRef: EventHandlerRef?
 
-    /// The time the key was pressed, used externally for tap-vs-hold detection.
     private(set) var keyDownAt: Date?
 
-    /// Returns `true` if the key-down happened less than 300 ms ago (i.e. a quick tap).
     var wasTap: Bool {
         guard let t = keyDownAt else { return false }
         return Date().timeIntervalSince(t) < 0.3
@@ -48,16 +38,13 @@ class HotkeyManager {
 
     // MARK: - Registration
 
-    /// Registers the global hotkey.
-    /// - Parameters:
-    ///   - keyCode: Virtual key code (default 49 = Space).
-    ///   - modifiers: Carbon modifier flags (default optionKey).
-    func register(keyCode: UInt32 = 49, modifiers: UInt32 = UInt32(optionKey)) {
+    /// Registers the global hotkey. Returns `true` if registration succeeded.
+    @discardableResult
+    func register(keyCode: UInt32 = 49, modifiers: UInt32 = UInt32(optionKey)) -> Bool {
         // Clean up any existing registration before re-registering
         if let ref = hotkeyRef { UnregisterEventHotKey(ref); hotkeyRef = nil }
         if let ref = handlerRef { RemoveEventHandler(ref); handlerRef = nil }
 
-        // Listen for both key-down and key-up
         var eventTypes = [
             EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed)),
             EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyReleased)),
@@ -72,11 +59,12 @@ class HotkeyManager {
             &handlerRef
         )
 
-        let hotKeyID = EventHotKeyID(signature: fourCharCode("WISP"), id: 1)
-        RegisterEventHotKey(keyCode, modifiers, hotKeyID, GetApplicationEventTarget(), 0, &hotkeyRef)
+        let hotKeyID = EventHotKeyID(signature: fourCharCode("MEMO"), id: 1)
+        let status = RegisterEventHotKey(keyCode, modifiers, hotKeyID, GetApplicationEventTarget(), 0, &hotkeyRef)
+        return status == noErr
     }
 
-    // MARK: - Internal handlers (called from the C callback on the main queue)
+    // MARK: - Internal handlers
 
     func handleKeyDown() {
         keyDownAt = Date()

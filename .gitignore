@@ -25,3 +25,11 @@ Config.xcconfig
 # CocoaPods (if ever added)
 Pods/
 Podfile.lock
+
+# Claude Code
+.claude/
+
+# App bundle build artifacts (Info.plist is tracked; binaries/resources are not)
+Memo.app/Contents/MacOS/
+Memo.app/Contents/Resources/
+Memo.app/Contents/_CodeSignature/

@@ -2,10 +2,13 @@ import SwiftUI
 import AppKit
 import CoreGraphics
 
+private enum KeyTestState: Equatable {
+    case idle, testing, valid, invalid(String)
+}
+
 struct SettingsView: View {
     @EnvironmentObject var appState: AppState
 
-    // Local copies so the user can cancel unsaved changes
     @State private var apiKey: String = ""
     @State private var language: String = "auto"
     @State private var mode: RecordingMode = .pushToTalk
@@ -13,6 +16,8 @@ struct SettingsView: View {
     @State private var hotkeyKeyCode: Int = 49
     @State private var hotkeyModifiers: Int = 2048
     @State private var saved = false
+    @State private var saveFailed = false
+    @State private var keyTestState: KeyTestState = .idle
 
     private let languages: [(label: String, code: String)] = [
         ("Auto-detect",  "auto"),
@@ -43,12 +48,22 @@ struct SettingsView: View {
                 SecureField("sk-…", text: $apiKey)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(.body, design: .monospaced))
-                HStack(spacing: 4) {
+                    .accessibilityLabel("OpenAI API Key")
+                    .onChange(of: apiKey) { _ in keyTestState = .idle }
+
+                HStack(spacing: 8) {
                     Image(systemName: "lock.fill")
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                     Text("Stored securely in the system Keychain.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    Spacer()
+                    keyTestResultBadge
+                    Button("Test Key") { testAPIKey() }
+                        .buttonStyle(.borderless)
+                        .disabled(apiKey.trimmingCharacters(in: .whitespaces).isEmpty
+                                  || keyTestState == .testing)
                 }
             } header: {
                 Text("OpenAI API Key")
@@ -105,7 +120,12 @@ struct SettingsView: View {
             // MARK: Save
             HStack {
                 Spacer()
-                if saved {
+                if saveFailed {
+                    Label("Keychain error — key not saved", systemImage: "xmark.circle.fill")
+                        .foregroundStyle(.red)
+                        .font(.system(size: 13, weight: .medium))
+                        .transition(.opacity)
+                } else if saved {
                     Label("Saved", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                         .font(.system(size: 13, weight: .medium))
@@ -118,18 +138,43 @@ struct SettingsView: View {
             .padding(.top, 4)
         }
         .formStyle(.grouped)
-        .frame(width: 440)
+        .frame(minWidth: 440, maxWidth: 440, minHeight: 360)
         .padding()
         .onAppear(perform: loadFromAppState)
+    }
+
+    // MARK: - Key test result badge
+
+    @ViewBuilder
+    private var keyTestResultBadge: some View {
+        switch keyTestState {
+        case .idle:
+            EmptyView()
+        case .testing:
+            ProgressView()
+                .scaleEffect(0.7)
+                .frame(width: 20, height: 20)
+        case .valid:
+            Label("Valid", systemImage: "checkmark.circle.fill")
+                .foregroundStyle(.green)
+                .font(.caption)
+                .transition(.opacity)
+        case .invalid(let msg):
+            Label(msg, systemImage: "xmark.circle.fill")
+                .foregroundStyle(.red)
+                .font(.caption)
+                .lineLimit(1)
+                .transition(.opacity)
+        }
     }
 
     // MARK: - Helpers
 
     private func keyBadge(_ label: String) -> some View {
         Text(label)
-            .font(.system(size: 12, weight: .medium, design: .monospaced))
+            .font(.callout.weight(.medium).monospaced())
             .padding(.horizontal, 8)
-            .padding(.vertical, 3)
+            .padding(.vertical, 4)
             .background(.quaternary, in: RoundedRectangle(cornerRadius: 5))
     }
 
@@ -149,11 +194,47 @@ struct SettingsView: View {
         appState.autoPasteEnabled = autoPaste
         appState.hotkeyKeyCode    = hotkeyKeyCode
         appState.hotkeyModifiers  = hotkeyModifiers
-        appState.savePreferences()
+        let ok = appState.savePreferences()
 
-        withAnimation { saved = true }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            withAnimation { saved = false }
+        if ok {
+            withAnimation { saved = true; saveFailed = false }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation { saved = false }
+            }
+        } else {
+            withAnimation { saveFailed = true; saved = false }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                withAnimation { saveFailed = false }
+            }
+        }
+    }
+
+    // MARK: - API Key test
+
+    private func testAPIKey() {
+        keyTestState = .testing
+        let trimmedKey = apiKey.trimmingCharacters(in: .whitespaces)
+        Task {
+            do {
+                let session = URLSession(configuration: .ephemeral)
+                var request = URLRequest(url: URL(string: "https://api.openai.com/v1/models")!)
+                request.setValue("Bearer \(trimmedKey)", forHTTPHeaderField: "Authorization")
+                request.timeoutInterval = 10
+                let (_, response) = try await session.data(for: request)
+                if let http = response as? HTTPURLResponse {
+                    withAnimation {
+                        keyTestState = http.statusCode == 200
+                            ? .valid
+                            : .invalid("Invalid key — check your OpenAI account")
+                    }
+                }
+            } catch {
+                withAnimation {
+                    keyTestState = .invalid("Couldn't reach OpenAI — check your connection")
+                }
+            }
+            try? await Task.sleep(for: .seconds(4))
+            withAnimation { keyTestState = .idle }
         }
     }
 }

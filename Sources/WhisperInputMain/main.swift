@@ -1,2 +1,0 @@
-import WhisperInput
-WhisperInputApp.main()

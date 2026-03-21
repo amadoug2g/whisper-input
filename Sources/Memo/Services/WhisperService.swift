@@ -1,5 +1,13 @@
 import Foundation
 
+// MARK: - Protocol
+
+protocol Transcribing: AnyObject {
+    func transcribe(audioURL: URL, apiKey: String, language: String?) async throws -> String
+}
+
+// MARK: - Errors
+
 enum WhisperError: LocalizedError {
     case missingAPIKey
     case httpError(Int, String)
@@ -10,7 +18,6 @@ enum WhisperError: LocalizedError {
         case .missingAPIKey:
             return "OpenAI API key is not set. Open Settings (menubar icon → Settings…) to add it."
         case .httpError(let code, let body):
-            // Parse OpenAI's JSON error message if present
             if let data = body.data(using: .utf8),
                let json = try? JSONDecoder().decode(OpenAIErrorResponse.self, from: data) {
                 return "API error \(code): \(json.error.message)"
@@ -27,16 +34,17 @@ private struct OpenAIErrorResponse: Decodable {
     let error: ErrorBody
 }
 
-class WhisperService {
+class WhisperService: Transcribing {
     private let endpoint = URL(string: "https://api.openai.com/v1/audio/transcriptions")!
-    private let session = URLSession(configuration: .ephemeral)
 
-    /// Transcribes an audio file using OpenAI's transcription API.
-    /// - Parameters:
-    ///   - audioURL: Local path to an m4a/mp3/wav file.
-    ///   - apiKey: OpenAI secret key.
-    ///   - language: Optional BCP-47 code ("en", "fr", …). `nil` = auto-detect.
-    /// - Returns: Trimmed transcription string.
+    /// Ephemeral session: no disk cache, no persistent credential storage.
+    private let session: URLSession = {
+        let config = URLSessionConfiguration.ephemeral
+        config.timeoutIntervalForRequest  = 30
+        config.timeoutIntervalForResource = 90
+        return URLSession(configuration: config)
+    }()
+
     func transcribe(audioURL: URL, apiKey: String, language: String?) async throws -> String {
         guard !apiKey.trimmingCharacters(in: .whitespaces).isEmpty else {
             throw WhisperError.missingAPIKey

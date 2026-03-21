@@ -1,15 +1,15 @@
 #!/bin/bash
-# Builds WhisperInput and launches it as a proper .app bundle.
+# Builds Memo and launches it as a proper .app bundle.
 # Ad-hoc signing lets macOS privacy dialogs work (mic, accessibility).
 # Run: chmod +x run.sh && ./run.sh
 
 set -euo pipefail
 
-APP_NAME="WhisperInput"
+APP_NAME="Memo"
 BUNDLE="${APP_NAME}.app"
-BINARY_SRC=".build/debug/WhisperInputMain"
+BINARY_SRC=".build/debug/MemoMain"
 
-echo "▶ Building…"
+echo "Building…"
 swift build 2>&1
 
 # Kill any running instance so the new one can start cleanly
@@ -19,7 +19,7 @@ if pgrep -xq "$APP_NAME"; then
     sleep 0.5
 fi
 
-echo "▶ Assembling ${BUNDLE}…"
+echo "Assembling ${BUNDLE}…"
 rm -rf "$BUNDLE"
 mkdir -p "$BUNDLE/Contents/MacOS"
 
@@ -31,11 +31,11 @@ cat > "$BUNDLE/Contents/Info.plist" << 'PLIST'
 <plist version="1.0">
 <dict>
     <key>CFBundleIdentifier</key>
-    <string>com.whisperinput.WhisperInput</string>
+    <string>com.memo.app</string>
     <key>CFBundleName</key>
-    <string>WhisperInput</string>
+    <string>Memo</string>
     <key>CFBundleExecutable</key>
-    <string>WhisperInput</string>
+    <string>Memo</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>CFBundleShortVersionString</key>
@@ -47,22 +47,21 @@ cat > "$BUNDLE/Contents/Info.plist" << 'PLIST'
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSMicrophoneUsageDescription</key>
-    <string>WhisperInput records your voice to transcribe it with the Whisper API.</string>
+    <string>Memo records your voice to transcribe it with the Whisper API.</string>
 </dict>
 </plist>
 PLIST
 
-echo "▶ Signing (ad-hoc)…"
+echo "Signing (ad-hoc)…"
 codesign --force --deep --sign - "$BUNDLE"
 
-echo "▶ Launching…"
+echo "Launching…"
 open "$BUNDLE"
 
 echo ""
-echo "✓ Done. Look for the mic icon (🎙) in your menu bar."
+echo "Done. Look for the mic icon in your menu bar."
 echo ""
 echo "First-run checklist:"
-echo "  1. Grant Accessibility when the system dialog appears"
-echo "     (System Settings → Privacy → Accessibility → toggle WhisperInput on)"
-echo "  2. Click the mic icon → Settings → paste your OpenAI API key → Save"
-echo "  3. Hold ⌥ Space to record. Release to transcribe."
+echo "  1. Click the mic icon → Settings → paste your OpenAI API key → Save"
+echo "  2. Hold ⌥ Space to record. Release to transcribe."
+echo "  3. Accessibility permission will be requested when you first paste."

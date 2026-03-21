@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.memo.app</string>
+    <key>CFBundleName</key>
+    <string>Memo</string>
+    <key>CFBundleExecutable</key>
+    <string>Memo</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Memo records your voice when you hold the global hotkey, then sends the audio to OpenAI's Whisper API for transcription. The recording is deleted immediately after transcription and is never stored on this device.</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIconName</key>
+    <string>AppIcon</string>
+    <key>NSAccessibilityUsageDescription</key>
+    <string>Memo uses Accessibility access to register a global keyboard shortcut and to paste transcribed text into the active application using simulated keyboard input. It does not monitor or record your keystrokes.</string>
+</dict>
+</plist>

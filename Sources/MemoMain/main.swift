@@ -1,0 +1,2 @@
+import Memo
+MemoApp.main()

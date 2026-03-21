@@ -1,0 +1,51 @@
+/* TranscriptionView — header titles */
+"Idle" = "Idle";
+"Listening…" = "Listening…";
+"Transcribing…" = "Transcribing…";
+"Review & edit" = "Review & edit";
+"Recording error" = "Recording error";
+"API key error" = "API key error";
+"Transcription error" = "Transcription error";
+"Connection error" = "Connection error";
+"Error" = "Error";
+
+/* TranscriptionView — content */
+"Release to transcribe" = "Release to transcribe";
+"Tap ⌥ Space to stop" = "Tap ⌥ Space to stop";
+"Cancel" = "Cancel";
+"Paste" = "Paste";
+"Press ⌥ Space to try again" = "Press ⌥ Space to try again";
+
+/* SettingsView */
+"OpenAI API Key" = "OpenAI API Key";
+"Stored securely in the system Keychain." = "Stored securely in the system Keychain.";
+"Test Key" = "Test Key";
+"Input Mode" = "Input Mode";
+"Transcription Language" = "Transcription Language";
+"Specifying a language improves accuracy and reduces latency." = "Specifying a language improves accuracy and reduces latency.";
+"Hotkey" = "Hotkey";
+"Global shortcut" = "Global shortcut";
+"Hotkey customization coming in a future release." = "Hotkey customization coming in a future release.";
+"Save" = "Save";
+"Saved" = "Saved";
+"Keychain error — key not saved" = "Keychain error — key not saved";
+"Valid" = "Valid";
+"Invalid key — check your OpenAI account" = "Invalid key — check your OpenAI account";
+"Couldn't reach OpenAI — check your connection" = "Couldn't reach OpenAI — check your connection";
+
+/* AppMenuView */
+"Memo turns speech into text using OpenAI Whisper." = "Memo turns speech into text using OpenAI Whisper.";
+"Add an API key in Settings to get started." = "Add an API key in Settings to get started.";
+"Open Settings…" = "Open Settings…";
+"Hotkey ⌥Space is claimed by another app" = "Hotkey ⌥Space is claimed by another app";
+"Stop Recording" = "Stop Recording";
+"Start Recording (⌥ Space)" = "Start Recording (⌥ Space)";
+"Settings…" = "Settings…";
+"Quit" = "Quit";
+
+/* Menu bar tooltip */
+"Memo — hold ⌥ Space to record" = "Memo — hold ⌥ Space to record";
+
+/* AppDelegate — accessibility alert */
+"Accessibility access required" = "Accessibility access required";
+"Open Settings" = "Open Settings";

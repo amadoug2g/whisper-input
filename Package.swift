@@ -2,26 +2,28 @@
 import PackageDescription
 
 let package = Package(
-    name: "WhisperInput",
+    name: "Memo",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v13)
     ],
     targets: [
-        // All app logic as a library so tests can import it.
         .target(
-            name: "WhisperInput",
-            path: "Sources/WhisperInput"
+            name: "Memo",
+            path: "Sources/Memo",
+            resources: [
+                .process("Resources"),
+            ]
         ),
-        // Thin entry point — calls WhisperInputApp.main().
         .executableTarget(
-            name: "WhisperInputMain",
-            dependencies: ["WhisperInput"],
-            path: "Sources/WhisperInputMain"
+            name: "MemoMain",
+            dependencies: ["Memo"],
+            path: "Sources/MemoMain"
         ),
         .testTarget(
-            name: "WhisperInputTests",
-            dependencies: ["WhisperInput"],
-            path: "Tests/WhisperInputTests"
+            name: "MemoTests",
+            dependencies: ["Memo"],
+            path: "Tests/MemoTests"
         )
     ]
 )

@@ -1,5 +1,5 @@
 import XCTest
-@testable import WhisperInput
+@testable import Memo
 
 final class WhisperServiceTests: XCTestCase {
     private let service = WhisperService()
