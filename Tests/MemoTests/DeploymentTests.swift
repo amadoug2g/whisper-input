@@ -2,13 +2,18 @@ import XCTest
 import Foundation
 
 /// Validates the app bundle structure and deployment assumptions.
-/// These tests catch configuration issues that cause launch failures
-/// (like unsigned binaries in /Applications).
+///
+/// macOS launch requirements on modern versions (Ventura+):
+///   - `open Foo.app` requires a valid code signature (ad-hoc is fine)
+///   - Unsigned binaries get "Launchd job spawn failed" (POSIX error 163)
+///   - Ad-hoc signing changes CDHash on each rebuild, which invalidates
+///     Accessibility (TCC) entries. This is an accepted trade-off: the
+///     session-level cache in AppDelegate avoids repeated prompts within
+///     a running session, and unchanged rebuilds keep the same CDHash.
 final class DeploymentTests: XCTestCase {
 
     private let fm = FileManager.default
     private lazy var projectRoot: URL = {
-        // Tests/MemoTests/DeploymentTests.swift → project root
         URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()  // MemoTests/
             .deletingLastPathComponent()  // Tests/
@@ -24,8 +29,6 @@ final class DeploymentTests: XCTestCase {
     // MARK: - Bundle structure
 
     func test_appBundle_exists() throws {
-        // Build creates Memo.app in the project root.
-        // If this fails, `swift build` or the bundle assembly step is broken.
         try XCTSkipUnless(
             fm.fileExists(atPath: bundlePath.path),
             "Memo.app not built yet — run ./run.sh first"
@@ -34,7 +37,6 @@ final class DeploymentTests: XCTestCase {
 
     func test_appBundle_hasBinary() throws {
         try XCTSkipUnless(fm.fileExists(atPath: bundlePath.path), "Memo.app not built yet")
-
         XCTAssertTrue(
             fm.isExecutableFile(atPath: binaryPath.path),
             "Memo.app/Contents/MacOS/Memo must exist and be executable"
@@ -43,7 +45,6 @@ final class DeploymentTests: XCTestCase {
 
     func test_appBundle_hasInfoPlist() throws {
         try XCTSkipUnless(fm.fileExists(atPath: bundlePath.path), "Memo.app not built yet")
-
         XCTAssertTrue(
             fm.fileExists(atPath: plistPath.path),
             "Memo.app/Contents/Info.plist must exist"
@@ -60,73 +61,50 @@ final class DeploymentTests: XCTestCase {
         XCTAssertEqual(dict["CFBundleIdentifier"] as? String, "com.memo.app")
         XCTAssertEqual(dict["CFBundleName"] as? String, "Memo")
         XCTAssertEqual(dict["CFBundleExecutable"] as? String, "Memo")
-
-        // LSUIElement = true means menu-bar-only (no Dock icon).
-        // This MUST be true, otherwise the app behaves differently.
         XCTAssertEqual(dict["LSUIElement"] as? Bool, true,
             "LSUIElement must be true for a menu-bar-only app")
-
         XCTAssertNotNil(dict["NSMicrophoneUsageDescription"],
             "Microphone usage description is required for recording")
     }
 
-    // MARK: - Code signing vs launch location
+    // MARK: - Code signing (must be ad-hoc signed to launch)
 
-    func test_unsignedBinary_mustNotLaunchFromApplications() throws {
+    func test_binary_isAdHocSigned() throws {
         try XCTSkipUnless(fm.fileExists(atPath: binaryPath.path), "Binary not built yet")
 
-        // Check if the binary is unsigned
+        // On modern macOS, `open Foo.app` REQUIRES a code signature.
+        // Unsigned binaries fail with "Launchd job spawn failed" (POSIX 163).
+        // Ad-hoc signing (`codesign --force --sign -`) satisfies this requirement.
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/usr/bin/codesign")
-        task.arguments = ["--verify", "--strict", binaryPath.path]
+        task.arguments = ["--verify", "--strict", bundlePath.path]
         let pipe = Pipe()
         task.standardError = pipe
         try task.run()
         task.waitUntilExit()
 
-        let isUnsigned = task.terminationStatus != 0
-
-        if isUnsigned {
-            // CRITICAL: macOS blocks unsigned apps from launching in /Applications.
-            // Error: "Launchd job spawn failed" (POSIX error 163).
-            // The run.sh script must NOT copy unsigned builds to /Applications.
-            //
-            // This test documents the constraint. If it fails, either:
-            // a) The binary is now signed (update run.sh to allow /Applications), or
-            // b) run.sh is incorrectly trying to launch unsigned from /Applications.
-
-            // Verify run.sh doesn't launch from /Applications for unsigned builds
-            let runShPath = projectRoot.appendingPathComponent("run.sh")
-            let runSh = try String(contentsOf: runShPath, encoding: .utf8)
-
-            // The script should launch from the project directory, not /Applications
-            XCTAssertFalse(
-                runSh.contains("open \"/Applications/"),
-                "run.sh must NOT launch unsigned builds from /Applications — " +
-                "macOS blocks unsigned apps there (POSIX error 163). " +
-                "Launch from the project directory instead."
-            )
-            XCTAssertFalse(
-                runSh.contains("open \"$INSTALLED\"") && runSh.contains("INSTALLED=\"${INSTALL_DIR}"),
-                "run.sh launches from /Applications but binary is unsigned — this will fail"
-            )
-        }
+        XCTAssertEqual(task.terminationStatus, 0,
+            "Memo.app must be code-signed (ad-hoc) to launch on modern macOS. " +
+            "Unsigned binaries get POSIX error 163. " +
+            "run.sh must use: codesign --force --sign - Memo.app")
     }
 
-    func test_runScript_exists_and_isExecutable() {
-        let runSh = projectRoot.appendingPathComponent("run.sh")
-        XCTAssertTrue(fm.fileExists(atPath: runSh.path), "run.sh must exist")
-        XCTAssertTrue(fm.isExecutableFile(atPath: runSh.path), "run.sh must be executable")
-    }
-
-    func test_runScript_stripsCodeSignature() throws {
+    func test_runScript_adHocSigns() throws {
         let runSh = projectRoot.appendingPathComponent("run.sh")
         let content = try String(contentsOf: runSh, encoding: .utf8)
 
+        // run.sh MUST ad-hoc sign the bundle so `open` works.
         XCTAssertTrue(
+            content.contains("codesign --force --sign -"),
+            "run.sh must ad-hoc sign the app bundle. Without this, " +
+            "`open Memo.app` fails with 'Launchd job spawn failed'."
+        )
+
+        // It must NOT strip the signature (that was the old broken approach).
+        XCTAssertFalse(
             content.contains("codesign --remove-signature"),
-            "Dev builds must strip code signature so Accessibility permission " +
-            "persists across rebuilds (macOS tracks by path for unsigned binaries)"
+            "run.sh must NOT strip the code signature — unsigned apps " +
+            "cannot launch on modern macOS (POSIX error 163)."
         )
     }
 
@@ -134,11 +112,33 @@ final class DeploymentTests: XCTestCase {
         let runSh = projectRoot.appendingPathComponent("run.sh")
         let content = try String(contentsOf: runSh, encoding: .utf8)
 
-        // Since we strip the code signature, we MUST launch from the project
-        // directory. /Applications rejects unsigned binaries.
         XCTAssertTrue(
             content.contains("open \"$BUNDLE\""),
-            "run.sh should launch the local Memo.app bundle (not from /Applications)"
+            "run.sh should launch the local Memo.app bundle"
+        )
+
+        // Must NOT try to copy to /Applications (would need proper signing)
+        XCTAssertFalse(
+            content.contains("/Applications"),
+            "run.sh must not deploy to /Applications for dev builds"
+        )
+    }
+
+    // MARK: - Script basics
+
+    func test_runScript_exists_and_isExecutable() {
+        let runSh = projectRoot.appendingPathComponent("run.sh")
+        XCTAssertTrue(fm.fileExists(atPath: runSh.path), "run.sh must exist")
+        XCTAssertTrue(fm.isExecutableFile(atPath: runSh.path), "run.sh must be executable")
+    }
+
+    func test_runScript_killsExistingInstance() throws {
+        let runSh = projectRoot.appendingPathComponent("run.sh")
+        let content = try String(contentsOf: runSh, encoding: .utf8)
+
+        XCTAssertTrue(
+            content.contains("pkill -x \"$APP_NAME\"") || content.contains("pkill -x Memo"),
+            "run.sh must kill any running Memo instance before relaunching"
         )
     }
 }

@@ -1,14 +1,14 @@
 #!/bin/bash
 # Builds Memo and launches it as a proper .app bundle.
 #
-# IMPORTANT: The dev build is NOT code-signed. This is intentional.
-# macOS tracks Accessibility permission by PATH for unsigned binaries,
-# which means the permission survives rebuilds. Ad-hoc signing creates
-# a new code identity on every build, invalidating the permission each time.
+# The build is ad-hoc signed (`codesign --force --sign -`). This is the
+# minimum macOS requires to launch via `open`. Without any signature,
+# modern macOS returns "Launchd job spawn failed" (POSIX error 163).
 #
-# NOTE: Unsigned apps CANNOT launch from /Applications (macOS blocks them
-# with "Launchd job spawn failed", POSIX error 163). Dev builds launch
-# from the project directory instead.
+# Trade-off: ad-hoc signing changes the CDHash when the binary changes,
+# which invalidates Accessibility (TCC) entries. The app handles this
+# with a session-level cache, so you only re-grant once per session
+# after a code change. Unchanged rebuilds keep the same CDHash.
 #
 # Run: chmod +x run.sh && ./run.sh
 
@@ -64,9 +64,9 @@ cat > "$BUNDLE/Contents/Info.plist" << 'PLIST'
 PLIST
 fi
 
-# Strip any existing code signature so macOS tracks Accessibility by path.
-# This means permission persists across rebuilds without re-granting.
-codesign --remove-signature "$BUNDLE" 2>/dev/null || true
+# Ad-hoc sign — required for `open` to work on modern macOS.
+# Without this: "Launchd job spawn failed" (POSIX error 163).
+codesign --force --sign - "$BUNDLE"
 
 echo "Launching…"
 open "$BUNDLE"
@@ -74,9 +74,8 @@ open "$BUNDLE"
 echo ""
 echo "Done. Look for the mic icon in your menu bar."
 echo ""
-echo "First run:"
-echo "  1. Hold ⌥ Space to record — you should see a tiny waveform pill."
-echo "  2. Release to transcribe."
-echo "  3. On first paste, grant Accessibility when prompted (persists across rebuilds)."
+echo "  Hold ⌥ Space to record — you'll see a tiny waveform pill."
+echo "  Release to transcribe."
 echo ""
-echo "Settings: click the mic icon in the menu bar → Settings."
+echo "  Settings: click the mic icon → Settings"
+echo "  (paste your OpenAI API key on first run)"
