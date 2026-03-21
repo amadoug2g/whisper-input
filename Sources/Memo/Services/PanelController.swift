@@ -21,13 +21,13 @@ final class PanelController {
         switch state {
         case .recording, .transcribing:
             removeClickOutsideMonitor()
-            show(activate: false)
+            show(activate: false, compact: true)
         case .editing:
-            show(activate: true)
+            show(activate: true, compact: false)
             installClickOutsideMonitor()
         case .error:
             removeClickOutsideMonitor()
-            show(activate: false)
+            show(activate: false, compact: false)
         case .idle:
             hide()
         }
@@ -41,7 +41,7 @@ final class PanelController {
         panel = nil
     }
 
-    private func show(activate: Bool) {
+    private func show(activate: Bool, compact: Bool) {
         if panel == nil { panel = buildPanel() }
 
         if activate {
@@ -52,7 +52,7 @@ final class PanelController {
             panel?.orderFront(nil)
         }
 
-        positionPanel()
+        positionPanel(compact: compact)
     }
 
     private func buildPanel() -> FloatingPanel {
@@ -78,11 +78,17 @@ final class PanelController {
         return panel
     }
 
-    private func positionPanel() {
+    private func positionPanel(compact: Bool) {
         guard let panel = panel, let screen = NSScreen.main else { return }
         let sf = screen.visibleFrame
+        // Compact pill: small, centered near the bottom of the screen.
+        // Full panel: wider, slightly higher so the editor is comfortable.
+        let contentSize = panel.contentView?.fittingSize ?? NSSize(width: 100, height: 40)
+        let w = compact ? max(contentSize.width, 80) : 400
+        let h = compact ? max(contentSize.height, 36) : panel.frame.height
+        panel.setContentSize(NSSize(width: w, height: h))
         let x = sf.midX - panel.frame.width / 2
-        let y = sf.minY + 48
+        let y = sf.minY + (compact ? 36 : 48)
         panel.setFrameOrigin(NSPoint(x: x, y: y))
     }
 

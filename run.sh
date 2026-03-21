@@ -1,7 +1,12 @@
 #!/bin/bash
 # Builds Memo and launches it as a proper .app bundle.
-# Preserves the existing bundle between rebuilds so that Accessibility
-# permission (granted by path) is not invalidated.
+#
+# IMPORTANT: The dev build is NOT code-signed. This is intentional.
+# macOS tracks Accessibility permission by PATH for unsigned binaries,
+# which means the permission survives rebuilds. Ad-hoc signing creates
+# a new code identity on every build, invalidating the permission each time.
+# Use `make app` for a signed release build.
+#
 # Run: chmod +x run.sh && ./run.sh
 
 set -euo pipefail
@@ -21,11 +26,9 @@ if pgrep -xq "$APP_NAME"; then
 fi
 
 # Create bundle structure only if it doesn't exist yet.
-# Preserving the bundle across rebuilds keeps the Accessibility
-# permission that macOS tracks by bundle path.
 mkdir -p "$BUNDLE/Contents/MacOS"
 
-# Update binary (always — it may have changed)
+# Update binary
 cp "$BINARY_SRC" "$BUNDLE/Contents/MacOS/$APP_NAME"
 
 # Write Info.plist only if missing
@@ -58,8 +61,8 @@ cat > "$BUNDLE/Contents/Info.plist" << 'PLIST'
 PLIST
 fi
 
-echo "Signing (ad-hoc)…"
-codesign --force --deep --sign - "$BUNDLE"
+# Strip any existing code signature so macOS tracks by path.
+codesign --remove-signature "$BUNDLE" 2>/dev/null || true
 
 echo "Launching…"
 open "$BUNDLE"
@@ -70,4 +73,5 @@ echo ""
 echo "First run:"
 echo "  1. Click the mic icon → Settings → paste your OpenAI API key → Done"
 echo "  2. Hold ⌥ Space to record. Release to transcribe."
-echo "  3. Accessibility permission is requested automatically when you paste."
+echo "  3. Accessibility permission is requested once on first paste."
+echo "     Grant it and it persists across rebuilds."
