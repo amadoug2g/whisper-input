@@ -64,14 +64,21 @@ fi
 # Strip any existing code signature so macOS tracks by path.
 codesign --remove-signature "$BUNDLE" 2>/dev/null || true
 
+# Copy to Applications folder for proper integration
+echo "Installing to /Applications…"
+cp -r "$BUNDLE" "/Applications/$BUNDLE" 2>/dev/null || {
+    echo "  (Could not copy to /Applications — running from project directory)"
+}
+
 echo "Launching…"
-open "$BUNDLE"
+open "/Applications/$BUNDLE" 2>/dev/null || open "$BUNDLE"
 
 echo ""
 echo "Done. Look for the mic icon in your menu bar."
 echo ""
 echo "First run:"
-echo "  1. Click the mic icon → Settings → paste your OpenAI API key → Done"
-echo "  2. Hold ⌥ Space to record. Release to transcribe."
-echo "  3. Accessibility permission is requested once on first paste."
-echo "     Grant it and it persists across rebuilds."
+echo "  1. Open System Settings › Privacy & Security › Accessibility"
+echo "  2. Ensure Memo.app is in the list and toggled ON"
+echo "  3. Click the mic icon → Settings → paste your OpenAI API key → Done"
+echo "  4. Hold ⌥ Space to record. Release to transcribe."
+echo "  5. On first paste, grant Accessibility if prompted (should persist across rebuilds)"
