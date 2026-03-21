@@ -5,7 +5,6 @@
 # macOS tracks Accessibility permission by PATH for unsigned binaries,
 # which means the permission survives rebuilds. Ad-hoc signing creates
 # a new code identity on every build, invalidating the permission each time.
-# Use `make app` for a signed release build.
 #
 # Run: chmod +x run.sh && ./run.sh
 
@@ -14,6 +13,8 @@ set -euo pipefail
 APP_NAME="Memo"
 BUNDLE="${APP_NAME}.app"
 BINARY_SRC=".build/debug/MemoMain"
+INSTALL_DIR="/Applications"
+INSTALLED="${INSTALL_DIR}/${BUNDLE}"
 
 echo "Building…"
 swift build 2>&1
@@ -64,14 +65,19 @@ fi
 # Strip any existing code signature so macOS tracks by path.
 codesign --remove-signature "$BUNDLE" 2>/dev/null || true
 
-# Copy to Applications folder for proper integration
-echo "Installing to /Applications…"
-cp -r "$BUNDLE" "/Applications/$BUNDLE" 2>/dev/null || {
+# Install to /Applications — remove old copy first to avoid cp -r nesting bug.
+echo "Installing to ${INSTALLED}…"
+rm -rf "$INSTALLED" 2>/dev/null || true
+cp -r "$BUNDLE" "$INSTALLED" 2>/dev/null || {
     echo "  (Could not copy to /Applications — running from project directory)"
+    INSTALLED="$BUNDLE"
 }
 
+# Clear macOS Launch Services cache so the new binary is picked up.
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$INSTALLED" 2>/dev/null || true
+
 echo "Launching…"
-open "/Applications/$BUNDLE" 2>/dev/null || open "$BUNDLE"
+open "$INSTALLED"
 
 echo ""
 echo "Done. Look for the mic icon in your menu bar."
@@ -81,4 +87,4 @@ echo "  1. Open System Settings › Privacy & Security › Accessibility"
 echo "  2. Ensure Memo.app is in the list and toggled ON"
 echo "  3. Click the mic icon → Settings → paste your OpenAI API key → Done"
 echo "  4. Hold ⌥ Space to record. Release to transcribe."
-echo "  5. On first paste, grant Accessibility if prompted (should persist across rebuilds)"
+echo "  5. On first paste, grant Accessibility if prompted (persists across rebuilds)"
