@@ -60,6 +60,7 @@ struct TranscriptionView: View {
             in: Capsule()
         )
         .shadow(color: Color.primary.opacity(0.12), radius: 8, y: 3)
+        .fixedSize()  // Tell NSHostingView: this is the exact size, don't expand
         .onAppear {
             if appState.isTranscribing { startTranscribingTimer() }
         }

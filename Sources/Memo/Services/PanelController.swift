@@ -7,8 +7,9 @@ import SwiftUI
 @MainActor
 final class PanelController {
 
-    private var panel: FloatingPanel?
+    private(set) var panel: FloatingPanel?
     private var clickOutsideMonitor: Any?
+    private(set) var isCompact: Bool?       // tracks current mode
     private let appState: AppState
 
     init(appState: AppState) {
@@ -39,10 +40,19 @@ final class PanelController {
         removeClickOutsideMonitor()
         panel?.orderOut(nil)
         panel = nil
+        isCompact = nil
     }
 
     private func show(activate: Bool, compact: Bool) {
-        if panel == nil { panel = buildPanel() }
+        // If the mode changed (compact ↔ full), destroy and rebuild so the
+        // NSHostingView recalculates its intrinsic size from scratch.
+        if isCompact != compact {
+            panel?.orderOut(nil)
+            panel = nil
+        }
+        isCompact = compact
+
+        if panel == nil { panel = buildPanel(compact: compact) }
 
         if activate {
             if #available(macOS 14, *) { NSApp.activate() }
@@ -52,14 +62,20 @@ final class PanelController {
             panel?.orderFront(nil)
         }
 
-        positionPanel(compact: compact)
+        positionPanel()
     }
 
-    private func buildPanel() -> FloatingPanel {
-        // Start with minimal size — will be resized in positionPanel()
+    private func buildPanel(compact: Bool) -> FloatingPanel {
+        let rootView = TranscriptionView()
+            .environmentObject(appState)
+
+        let hostingView = NSHostingView(rootView: rootView)
+        // Let the hosting view calculate its ideal size from the SwiftUI content.
+        let fittingSize = hostingView.fittingSize
+
         let panel = FloatingPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 120, height: 40),
-            styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
+            contentRect: NSRect(origin: .zero, size: fittingSize),
+            styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
@@ -72,28 +88,15 @@ final class PanelController {
         panel.isMovableByWindowBackground = true
         panel.hidesOnDeactivate = false
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        panel.contentView = NSHostingView(
-            rootView: TranscriptionView()
-                .environmentObject(appState)
-        )
+        panel.contentView = hostingView
         return panel
     }
 
-    private func positionPanel(compact: Bool) {
+    private func positionPanel() {
         guard let panel = panel, let screen = NSScreen.main else { return }
         let sf = screen.visibleFrame
-
-        // Set size based on state
-        if compact {
-            // Recording/transcribing: tiny pill with just waveform
-            panel.setContentSize(NSSize(width: 140, height: 32))
-        } else {
-            // Editing/error: wider panel for text + buttons
-            panel.setContentSize(NSSize(width: 400, height: 280))
-        }
-
         let x = sf.midX - panel.frame.width / 2
-        let y = sf.minY + (compact ? 40 : 48)
+        let y = sf.minY + ((isCompact == true) ? 40 : 48)
         panel.setFrameOrigin(NSPoint(x: x, y: y))
     }
 
