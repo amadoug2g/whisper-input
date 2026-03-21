@@ -1,54 +1,62 @@
 import AppKit
 import CoreGraphics
 
-/// Injects text directly as keystrokes using CGEvent unicode string injection.
-/// This does NOT touch the system clipboard.
+/// Pastes text into the frontmost application using the system clipboard
+/// and a simulated ⌘V keystroke.
 ///
-/// - Requires: Accessibility permission
-///   (System Settings › Privacy & Security › Accessibility).
+/// This approach is more reliable than character-by-character CGEvent injection
+/// because it works in Electron apps, terminal emulators, and apps that intercept
+/// synthetic key events. The previous clipboard contents are saved and restored.
 ///
-/// - Note: CGEvent unicode injection works in virtually all Cocoa apps.
-///   A small handful of apps (Electron-based, some games) may ignore synthetic
-///   events; for those, falling back to clipboard + Cmd+V is the safest option.
+/// Requires: Accessibility permission (for CGEvent posting).
 class PasteService {
 
-    /// Injects `text` into whatever window has keyboard focus at call time.
-    /// Must be called after the target app has been re-activated and focus
-    /// has settled (the caller is responsible for that delay).
     func typeText(_ text: String) {
         guard !text.isEmpty else { return }
+
+        let pasteboard = NSPasteboard.general
+
+        // Save current clipboard contents
+        let savedChangeCount = pasteboard.changeCount
+        let savedItems = pasteboard.pasteboardItems?.compactMap { item -> [NSPasteboard.PasteboardType: Data] in
+            var dict = [NSPasteboard.PasteboardType: Data]()
+            for type in item.types {
+                if let data = item.data(forType: type) {
+                    dict[type] = data
+                }
+            }
+            return dict
+        } ?? []
+
+        // Set our text
+        pasteboard.clearContents()
+        pasteboard.setString(text, forType: .string)
+
+        // Simulate ⌘V
         guard let source = CGEventSource(stateID: .hidSystemState) else { return }
+        let vKeyCode: CGKeyCode = 9  // 'v'
 
-        for scalar in text.unicodeScalars {
-            if scalar == "\n" || scalar == "\r" {
-                // Inject a hardware Return keystroke (keyCode 36) so apps that
-                // handle \n structurally (e.g. multiline text views) get the
-                // correct event.
-                postKey(keyCode: 36, source: source)
-            } else {
-                // Build a UTF-16 representation of the character and attach it
-                // to a synthetic key event with virtual keyCode 0.  The
-                // receiving app reads the unicode payload, not the keyCode.
-                var utf16 = Array(String(scalar).utf16)
-                guard !utf16.isEmpty else { continue }
+        let down = CGEvent(keyboardEventSource: source, virtualKey: vKeyCode, keyDown: true)
+        down?.flags = .maskCommand
+        down?.post(tap: .cghidEventTap)
 
-                let down = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true)
-                down?.keyboardSetUnicodeString(stringLength: utf16.count, unicodeString: &utf16)
-                down?.post(tap: .cghidEventTap)
+        let up = CGEvent(keyboardEventSource: source, virtualKey: vKeyCode, keyDown: false)
+        up?.flags = .maskCommand
+        up?.post(tap: .cghidEventTap)
 
-                let up = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: false)
-                up?.keyboardSetUnicodeString(stringLength: utf16.count, unicodeString: &utf16)
-                up?.post(tap: .cghidEventTap)
+        // Restore the previous clipboard after a short delay
+        // (the target app needs time to read the paste).
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            // Only restore if nobody else has changed the clipboard
+            guard pasteboard.changeCount == savedChangeCount + 1 else { return }
+            pasteboard.clearContents()
+            for itemDict in savedItems {
+                let item = NSPasteboardItem()
+                for (type, data) in itemDict {
+                    item.setData(data, forType: type)
+                }
+                pasteboard.writeObjects([item])
             }
         }
-    }
-
-    // MARK: - Private
-
-    private func postKey(keyCode: CGKeyCode, source: CGEventSource) {
-        CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: true)?
-            .post(tap: .cghidEventTap)
-        CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: false)?
-            .post(tap: .cghidEventTap)
     }
 }

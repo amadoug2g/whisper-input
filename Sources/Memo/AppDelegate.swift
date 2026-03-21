@@ -104,12 +104,17 @@ extension AppDelegate: PasteOrchestrating {
     func orchestratePaste(_ text: String) {
         panelController.hide()
 
-        // Check Accessibility permission contextually — only when actually needed.
+        // Check Accessibility permission. On modern macOS (Ventura+), granting
+        // permission takes effect immediately without relaunch.
         guard AXIsProcessTrusted() else {
-            showAccessibilityPermissionAlert()
+            requestAccessibilityAndRetryPaste(text)
             return
         }
 
+        performPaste(text)
+    }
+
+    private func performPaste(_ text: String) {
         if let app = previousApp, !app.isTerminated {
             app.activate(options: .activateIgnoringOtherApps)
         }
@@ -120,19 +125,24 @@ extension AppDelegate: PasteOrchestrating {
         }
     }
 
-    private func showAccessibilityPermissionAlert() {
-        let alert = NSAlert()
-        alert.messageText = "Accessibility access required"
-        alert.informativeText = "Memo needs Accessibility access to paste transcribed text into other apps. Click \"Open Settings\" to grant access, then relaunch Memo."
-        alert.addButton(withTitle: "Open Settings")
-        alert.addButton(withTitle: "Cancel")
-        alert.alertStyle = .warning
-
-        if alert.runModal() == .alertFirstButtonReturn {
-            let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
-            NSWorkspace.shared.open(url)
-        }
+    /// Shows the system Accessibility prompt and polls until the user grants it.
+    /// When granted, automatically completes the pending paste.
+    private func requestAccessibilityAndRetryPaste(_ text: String) {
+        // Trigger the system permission prompt (shows the toggle in System Settings).
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
         AXIsProcessTrustedWithOptions(options as CFDictionary)
+
+        // Poll every second for up to 30 seconds. Once the user flips the toggle
+        // in System Settings, AXIsProcessTrusted() returns true immediately on
+        // macOS 13+ — no relaunch needed.
+        Task { @MainActor [weak self] in
+            for _ in 0..<30 {
+                try? await Task.sleep(for: .seconds(1))
+                if AXIsProcessTrusted() {
+                    self?.performPaste(text)
+                    return
+                }
+            }
+        }
     }
 }

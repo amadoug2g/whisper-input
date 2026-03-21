@@ -1,6 +1,7 @@
 #!/bin/bash
 # Builds Memo and launches it as a proper .app bundle.
-# Ad-hoc signing lets macOS privacy dialogs work (mic, accessibility).
+# Preserves the existing bundle between rebuilds so that Accessibility
+# permission (granted by path) is not invalidated.
 # Run: chmod +x run.sh && ./run.sh
 
 set -euo pipefail
@@ -19,12 +20,16 @@ if pgrep -xq "$APP_NAME"; then
     sleep 0.5
 fi
 
-echo "Assembling ${BUNDLE}…"
-rm -rf "$BUNDLE"
+# Create bundle structure only if it doesn't exist yet.
+# Preserving the bundle across rebuilds keeps the Accessibility
+# permission that macOS tracks by bundle path.
 mkdir -p "$BUNDLE/Contents/MacOS"
 
+# Update binary (always — it may have changed)
 cp "$BINARY_SRC" "$BUNDLE/Contents/MacOS/$APP_NAME"
 
+# Write Info.plist only if missing
+if [ ! -f "$BUNDLE/Contents/Info.plist" ]; then
 cat > "$BUNDLE/Contents/Info.plist" << 'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -51,6 +56,7 @@ cat > "$BUNDLE/Contents/Info.plist" << 'PLIST'
 </dict>
 </plist>
 PLIST
+fi
 
 echo "Signing (ad-hoc)…"
 codesign --force --deep --sign - "$BUNDLE"
@@ -61,7 +67,7 @@ open "$BUNDLE"
 echo ""
 echo "Done. Look for the mic icon in your menu bar."
 echo ""
-echo "First-run checklist:"
-echo "  1. Click the mic icon → Settings → paste your OpenAI API key → Save"
+echo "First run:"
+echo "  1. Click the mic icon → Settings → paste your OpenAI API key → Done"
 echo "  2. Hold ⌥ Space to record. Release to transcribe."
-echo "  3. Accessibility permission will be requested when you first paste."
+echo "  3. Accessibility permission is requested automatically when you paste."

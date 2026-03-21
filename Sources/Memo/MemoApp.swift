@@ -88,19 +88,19 @@ private struct AppMenuView: View {
     let toggleRecording: () -> Void
     @ObservedObject var menuBarState: MenuBarState
 
-    private func openSettings() {
-        if #available(macOS 14, *) { NSApp.activate() }
-        else { NSApp.activate(ignoringOtherApps: true) }
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-    }
-
     var body: some View {
         if menuBarState.needsSetup {
             Text("Memo turns speech into text using OpenAI Whisper.")
                 .foregroundStyle(.secondary)
             Text("Add an API key in Settings to get started.")
                 .foregroundStyle(.secondary)
-            Button("Open Settings…") { openSettings() }
+            if #available(macOS 14, *) {
+                SettingsLink { Text("Open Settings…") }
+            } else {
+                Button("Open Settings…") {
+                    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                }
+            }
             Divider()
         }
 
@@ -119,7 +119,13 @@ private struct AppMenuView: View {
         }
         .disabled(menuBarState.needsSetup)
         Divider()
-        Button("Settings…") { openSettings() }
+        if #available(macOS 14, *) {
+            SettingsLink { Text("Settings…") }
+        } else {
+            Button("Settings…") {
+                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+            }
+        }
         Divider()
         Button("Quit") {
             NSApp.terminate(nil)
