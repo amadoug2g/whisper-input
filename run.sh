@@ -1,14 +1,10 @@
 #!/bin/bash
 # Builds Memo and launches it as a proper .app bundle.
 #
-# The build is ad-hoc signed (`codesign --force --sign -`). This is the
-# minimum macOS requires to launch via `open`. Without any signature,
-# modern macOS returns "Launchd job spawn failed" (POSIX error 163).
-#
-# Trade-off: ad-hoc signing changes the CDHash when the binary changes,
-# which invalidates Accessibility (TCC) entries. The app handles this
-# with a session-level cache, so you only re-grant once per session
-# after a code change. Unchanged rebuilds keep the same CDHash.
+# Accessibility permission is preserved across restarts by only re-signing
+# when the binary actually changed. macOS tracks Accessibility by CDHash
+# (code signature hash) — if the binary is identical, the CDHash is
+# identical, and the TCC entry stays valid. No re-grant needed.
 #
 # Run: chmod +x run.sh && ./run.sh
 
@@ -17,6 +13,7 @@ set -euo pipefail
 APP_NAME="Memo"
 BUNDLE="${APP_NAME}.app"
 BINARY_SRC=".build/debug/MemoMain"
+BINARY_DEST="$BUNDLE/Contents/MacOS/$APP_NAME"
 
 echo "Building…"
 swift build 2>&1
@@ -30,9 +27,6 @@ fi
 
 # Create bundle structure only if it doesn't exist yet.
 mkdir -p "$BUNDLE/Contents/MacOS"
-
-# Update binary
-cp "$BINARY_SRC" "$BUNDLE/Contents/MacOS/$APP_NAME"
 
 # Write Info.plist only if missing
 if [ ! -f "$BUNDLE/Contents/Info.plist" ]; then
@@ -64,9 +58,18 @@ cat > "$BUNDLE/Contents/Info.plist" << 'PLIST'
 PLIST
 fi
 
-# Ad-hoc sign — required for `open` to work on modern macOS.
-# Without this: "Launchd job spawn failed" (POSIX error 163).
-codesign --force --sign - "$BUNDLE"
+# Only copy + re-sign if the binary actually changed.
+# Skipping re-sign preserves the CDHash → Accessibility TCC entry survives.
+if cmp -s "$BINARY_SRC" "$BINARY_DEST" 2>/dev/null; then
+    echo "  Binary unchanged — keeping existing signature (Accessibility stays granted)"
+else
+    echo "  Binary changed — updating and re-signing…"
+    cp "$BINARY_SRC" "$BINARY_DEST"
+    # Ad-hoc sign — required for `open` to work on modern macOS.
+    codesign --force --sign - "$BUNDLE"
+    echo "  ⚠️  If Accessibility was granted before, re-grant it once in:"
+    echo "     System Settings → Privacy & Security → Accessibility → Memo"
+fi
 
 echo "Launching…"
 open "$BUNDLE"
@@ -76,6 +79,3 @@ echo "Done. Look for the mic icon in your menu bar."
 echo ""
 echo "  Hold ⌥ Space to record — you'll see a tiny waveform pill."
 echo "  Release to transcribe."
-echo ""
-echo "  Settings: click the mic icon → Settings"
-echo "  (paste your OpenAI API key on first run)"

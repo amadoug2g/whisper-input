@@ -108,6 +108,21 @@ final class DeploymentTests: XCTestCase {
         )
     }
 
+    func test_runScript_onlyResignsWhenBinaryChanged() throws {
+        let runSh = projectRoot.appendingPathComponent("run.sh")
+        let content = try String(contentsOf: runSh, encoding: .utf8)
+
+        // CRITICAL for UX: re-signing on every run invalidates the Accessibility
+        // TCC entry (CDHash changes), forcing the user to re-grant every launch.
+        // The script must compare binaries and only re-sign when code changed.
+        XCTAssertTrue(
+            content.contains("cmp -s"),
+            "run.sh must compare binaries with `cmp -s` and skip re-signing " +
+            "when the binary is unchanged. Re-signing every run invalidates " +
+            "the Accessibility TCC entry and forces repeated permission prompts."
+        )
+    }
+
     func test_runScript_launchesFromProjectDirectory() throws {
         let runSh = projectRoot.appendingPathComponent("run.sh")
         let content = try String(contentsOf: runSh, encoding: .utf8)
