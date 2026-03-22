@@ -185,35 +185,47 @@ struct SettingsView: View {
     }
 
     private func bringToFront() {
-        // Accessory apps don't activate automatically — force it so the
-        // settings window appears in front of everything else.
-        if #available(macOS 14, *) { NSApp.activate() }
-        else { NSApp.activate(ignoringOtherApps: true) }
+        // Accessory apps (.accessory activation policy) don't own the active
+        // space, so windows silently open behind everything. The deprecated
+        // activate(ignoringOtherApps:) is the only reliable way to force an
+        // accessory app to the front on all macOS versions.
+        NSApp.activate(ignoringOtherApps: true)
 
-        // Reposition to the screen containing the cursor (in case the user
-        // has multiple monitors and the window opens on the wrong one).
-        DispatchQueue.main.async {
-            guard let window = NSApp.keyWindow else { return }
+        // The Settings scene window may not be key yet — wait one runloop
+        // tick, then find it and force it to front with orderFrontRegardless().
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            // Find the Settings window: it's a non-panel, visible window.
+            let settingsWindow = NSApp.windows.first(where: {
+                !($0 is NSPanel) && $0.isVisible
+            }) ?? NSApp.keyWindow
+
+            guard let window = settingsWindow else { return }
+
+            // Move to the screen containing the cursor.
             let mouse = NSEvent.mouseLocation
-            let targetScreen = NSScreen.screens.first { $0.frame.contains(mouse) } ?? NSScreen.main
-            guard let screen = targetScreen, window.screen != screen else {
-                window.makeKeyAndOrderFront(nil)
-                return
+            let screen = NSScreen.screens.first { $0.frame.contains(mouse) }
+                ?? NSScreen.main
+            if let screen {
+                let sf = screen.visibleFrame
+                let origin = NSPoint(
+                    x: sf.midX - window.frame.width / 2,
+                    y: sf.midY - window.frame.height / 2
+                )
+                window.setFrameOrigin(origin)
             }
-            let sf = screen.visibleFrame
-            let origin = NSPoint(
-                x: sf.midX - window.frame.width / 2,
-                y: sf.midY - window.frame.height / 2
-            )
-            window.setFrameOrigin(origin)
+
             window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
         }
     }
 
     private func saveAndClose() {
         save()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            NSApp.keyWindow?.close()
+            let window = NSApp.windows.first(where: {
+                !($0 is NSPanel) && $0.isVisible
+            }) ?? NSApp.keyWindow
+            window?.close()
         }
     }
 

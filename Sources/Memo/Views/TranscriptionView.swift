@@ -8,171 +8,92 @@ struct TranscriptionView: View {
     @State private var transcribingElapsed: Int = 0
     @State private var transcribingTimer: Timer?
     @State private var isVisible = false
-    @State private var dotPulsing = false
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    private var isCompact: Bool {
+        appState.isRecording || appState.isTranscribing
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            Divider()
-            content
-                .transition(.opacity)
-            if appState.isEditing {
-                Divider()
-                footer
-                    .transition(.opacity)
+        Group {
+            if isCompact {
+                compactBody
+            } else {
+                fullBody
             }
         }
-        .background(
-            reduceTransparency
-                ? AnyShapeStyle(Color(NSColor.windowBackgroundColor))
-                : AnyShapeStyle(.regularMaterial),
-            in: RoundedRectangle(cornerRadius: 14)
-        )
-        .frame(width: 480)
-        .shadow(color: Color.primary.opacity(0.15), radius: 20, y: 6)
         .opacity(isVisible ? 1 : 0)
-        .scaleEffect(isVisible ? 1 : 0.97, anchor: .bottom)
-        .animation(.easeOut(duration: 0.2), value: appState.recordingState)
+        .scaleEffect(isVisible ? 1 : 0.95, anchor: .bottom)
+        .animation(.easeOut(duration: 0.15), value: appState.recordingState)
         .onAppear {
-            withAnimation(.easeOut(duration: 0.18)) { isVisible = true }
+            withAnimation(.easeOut(duration: 0.12)) { isVisible = true }
         }
         .onChange(of: appState.recordingState) { state in
             if state == .editing { editorFocused = true }
         }
     }
 
-    // MARK: - Header
+    // MARK: - Compact pill (recording / transcribing)
 
-    private var header: some View {
-        HStack(spacing: 8) {
-            statusDot
-            Text(headerTitle)
-                .font(.body.weight(.medium))
-            Spacer()
-            Button("Cancel") { appState.reset() }
-                .buttonStyle(.plain)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .keyboardShortcut(.escape, modifiers: [])
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-    }
-
-    private var statusDot: some View {
-        Circle()
-            .fill(dotColor)
-            .frame(width: 8, height: 8)
-            .overlay {
-                if appState.isRecording && !reduceMotion {
-                    Circle()
-                        .stroke(dotColor.opacity(0.5), lineWidth: 1.5)
-                        .frame(width: 8, height: 8)
-                        .scaleEffect(dotPulsing ? 2.8 : 1)
-                        .opacity(dotPulsing ? 0 : 0.8)
-                        .animation(
-                            .easeOut(duration: 1.0).repeatForever(autoreverses: false),
-                            value: dotPulsing
-                        )
-                        .onAppear { dotPulsing = true }
-                        .onDisappear { dotPulsing = false }
+    private var compactBody: some View {
+        HStack(spacing: 6) {
+            if appState.isRecording {
+                WaveformView(level: appState.audioLevel)
+            } else {
+                ProgressView()
+                    .scaleEffect(0.55)
+                    .frame(width: 14, height: 14)
+                if transcribingElapsed >= 2 {
+                    Text("\(transcribingElapsed)s")
+                        .font(.system(size: 10, weight: .medium).monospacedDigit())
+                        .foregroundStyle(.secondary)
                 }
             }
-            .accessibilityHidden(true)
-    }
-
-    private var dotColor: Color {
-        switch appState.recordingState {
-        case .idle:         return .gray
-        case .recording:    return .red
-        case .transcribing: return .orange
-        case .editing:      return .green
-        case .error:        return .red
         }
-    }
-
-    private var headerTitle: String {
-        switch appState.recordingState {
-        case .idle:         return String(localized: "Idle")
-        case .recording:    return String(localized: "Listening…")
-        case .transcribing: return String(localized: "Transcribing…")
-        case .editing:      return String(localized: "Review & edit")
-        case .error(let msg): return errorHeaderTitle(for: msg)
-        }
-    }
-
-    private func errorHeaderTitle(for message: String) -> String {
-        let m = message.lowercased()
-        if m.contains("microphone") || m.contains("audio") || m.contains("permission") {
-            return String(localized: "Recording error")
-        }
-        if m.contains("api key") || m.contains("invalid key") || m.contains("key is not set") {
-            return String(localized: "API key error")
-        }
-        if m.contains("api error") || m.contains("transcription") || m.contains("empty") {
-            return String(localized: "Transcription error")
-        }
-        if m.contains("reach") || m.contains("connection") || m.contains("network") {
-            return String(localized: "Connection error")
-        }
-        return String(localized: "Error")
-    }
-
-    // MARK: - Content
-
-    @ViewBuilder
-    private var content: some View {
-        switch appState.recordingState {
-        case .recording:
-            recordingContent
-        case .transcribing:
-            transcribingContent
-        case .editing:
-            editingContent
-        case .error(let message):
-            errorContent(message)
-        case .idle:
-            Color.clear.frame(height: 0)
-        }
-    }
-
-    private var recordingContent: some View {
-        VStack(spacing: 10) {
-            WaveformView(level: appState.audioLevel)
-            Text(appState.recordingMode == .pushToTalk ? "Release to transcribe" : "Tap ⌥ Space to stop")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
-    }
-
-    private var transcribingContent: some View {
-        HStack(spacing: 10) {
-            ProgressView()
-                .scaleEffect(0.8)
-            Text(transcribingElapsed >= 2
-                 ? "Transcribing… \(transcribingElapsed)s"
-                 : "Transcribing…")
-                .font(.body.monospacedDigit())
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
+            reduceTransparency
+                ? AnyShapeStyle(Color(NSColor.windowBackgroundColor))
+                : AnyShapeStyle(.regularMaterial),
+            in: Capsule()
+        )
+        .shadow(color: Color.primary.opacity(0.12), radius: 8, y: 3)
+        .fixedSize()  // Tell NSHostingView: this is the exact size, don't expand
         .onAppear {
-            transcribingElapsed = 0
-            transcribingTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                transcribingElapsed += 1
+            if appState.isTranscribing { startTranscribingTimer() }
+        }
+        .onDisappear { stopTranscribingTimer() }
+        .onChange(of: appState.isTranscribing) { transcribing in
+            if transcribing { startTranscribingTimer() }
+            else { stopTranscribingTimer() }
+        }
+    }
+
+    // MARK: - Full panel (editing / error)
+
+    private var fullBody: some View {
+        VStack(spacing: 0) {
+            if appState.isEditing {
+                editingContent
+                Divider()
+                footer
+            } else if case .error(let message) = appState.recordingState {
+                errorContent(message)
             }
         }
-        .onDisappear {
-            transcribingTimer?.invalidate()
-            transcribingTimer = nil
-            transcribingElapsed = 0
-        }
+        .background(
+            reduceTransparency
+                ? AnyShapeStyle(Color(NSColor.windowBackgroundColor))
+                : AnyShapeStyle(.regularMaterial),
+            in: RoundedRectangle(cornerRadius: 12)
+        )
+        .frame(width: 400)
+        .shadow(color: Color.primary.opacity(0.15), radius: 16, y: 5)
     }
+
+    // MARK: - Editing
 
     private var editingContent: some View {
         TextEditor(text: $appState.transcribedText)
@@ -180,36 +101,37 @@ struct TranscriptionView: View {
             .font(.body)
             .scrollContentBackground(.hidden)
             .padding(10)
-            .frame(minHeight: 88, maxHeight: 160)
+            .frame(minHeight: 72, maxHeight: 140)
             .accessibilityLabel("Transcription")
             .accessibilityHint("Edit text before pasting into the active application")
     }
 
+    // MARK: - Error
+
     private func errorContent(_ message: String) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 8) {
                 Image(systemName: "exclamationmark.circle.fill")
                     .foregroundStyle(.red)
-                    .imageScale(.medium)
+                    .imageScale(.small)
                     .accessibilityHidden(true)
                 Text(message)
-                    .font(.body)
+                    .font(.callout)
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Text("Press ⌥ Space to try again")
-                .font(.caption)
+                .font(.caption2)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 16)
+        .padding(12)
     }
 
     // MARK: - Footer
 
     private var footer: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             Spacer()
             Button("Paste") { appState.confirmAndPaste() }
                 .accessibilityLabel("Paste")
@@ -219,8 +141,23 @@ struct TranscriptionView: View {
                 .keyboardShortcut(.return, modifiers: .command)
                 .disabled(appState.transcribedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+    }
+
+    // MARK: - Timer helpers
+
+    private func startTranscribingTimer() {
+        transcribingElapsed = 0
+        transcribingTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            transcribingElapsed += 1
+        }
+    }
+
+    private func stopTranscribingTimer() {
+        transcribingTimer?.invalidate()
+        transcribingTimer = nil
+        transcribingElapsed = 0
     }
 }
 
@@ -229,49 +166,49 @@ struct TranscriptionView: View {
 struct WaveformView: View {
     var level: Float
 
-    private let barCount = 7
+    private let barCount = 5
     @State private var phases: [Double]
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(level: Float) {
         self.level = level
-        _phases = State(initialValue: (0..<7).map { Double($0) * 0.45 })
+        _phases = State(initialValue: (0..<5).map { Double($0) * 0.5 })
     }
 
     private let timer = Timer.publish(every: 0.07, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        HStack(alignment: .center, spacing: 4) {
+        HStack(alignment: .center, spacing: 3) {
             ForEach(0..<barCount, id: \.self) { i in
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(barColor(for: i))
-                    .frame(width: 4, height: reduceMotion ? 12 : barHeight(for: i))
+                RoundedRectangle(cornerRadius: 1.5)
+                    .fill(Color.red.opacity(barOpacity(for: i)))
+                    .frame(width: 3, height: reduceMotion ? 8 : barHeight(for: i))
                     .animation(reduceMotion ? nil : .easeInOut(duration: 0.07), value: barHeight(for: i))
             }
         }
-        .frame(height: 44)
+        .frame(height: 20)
         .accessibilityHidden(true)
         .onReceive(timer) { _ in
             if !reduceMotion {
-                for i in 0..<barCount { phases[i] += 0.25 }
+                for i in 0..<barCount { phases[i] += 0.3 }
             }
         }
     }
 
     private func barHeight(for index: Int) -> CGFloat {
         let base: CGFloat = 3
-        let peak: CGFloat = 38
+        let peak: CGFloat = 18
         let envelope = CGFloat(level)
         let wave = CGFloat((sin(phases[index]) + 1) / 2)
-        let idleHeight = base + (peak * 0.15) * wave
+        let idleHeight = base + (peak * 0.12) * wave
         return envelope > 0.02
             ? base + (peak - base) * envelope * (0.5 + 0.5 * wave)
             : idleHeight
     }
 
-    private func barColor(for index: Int) -> Color {
+    private func barOpacity(for index: Int) -> Double {
         let centre = Double(barCount - 1) / 2
         let dist = abs(Double(index) - centre) / centre
-        return Color.accentColor.opacity(1.0 - dist * 0.35)
+        return 0.9 - dist * 0.25
     }
 }

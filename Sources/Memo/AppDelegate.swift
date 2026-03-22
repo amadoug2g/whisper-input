@@ -12,6 +12,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var panelController = PanelController(appState: appState)
     private var hotkeyManager: HotkeyManager?
     private let pasteService = PasteService()
+    private var accessibilityTrusted = false
     private var previousApp: NSRunningApplication?
     private var stateCancellable: AnyCancellable?
     private var hotkeySettingsCancellable: AnyCancellable?
@@ -104,9 +105,14 @@ extension AppDelegate: PasteOrchestrating {
     func orchestratePaste(_ text: String) {
         panelController.hide()
 
-        // Check Accessibility permission. On modern macOS (Ventura+), granting
-        // permission takes effect immediately without relaunch.
-        guard AXIsProcessTrusted() else {
+        // Once Accessibility is granted during this session, skip rechecking.
+        // AXIsProcessTrusted() can return stale false for code-signed dev
+        // builds if the signature changed since the TCC entry was created.
+        if !accessibilityTrusted {
+            accessibilityTrusted = AXIsProcessTrusted()
+        }
+
+        guard accessibilityTrusted else {
             requestAccessibilityAndRetryPaste(text)
             return
         }
@@ -139,6 +145,7 @@ extension AppDelegate: PasteOrchestrating {
             for _ in 0..<30 {
                 try? await Task.sleep(for: .seconds(1))
                 if AXIsProcessTrusted() {
+                    self?.accessibilityTrusted = true
                     self?.performPaste(text)
                     return
                 }

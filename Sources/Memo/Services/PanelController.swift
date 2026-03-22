@@ -7,8 +7,9 @@ import SwiftUI
 @MainActor
 final class PanelController {
 
-    private var panel: FloatingPanel?
+    private(set) var panel: FloatingPanel?
     private var clickOutsideMonitor: Any?
+    private(set) var isCompact: Bool?       // tracks current mode
     private let appState: AppState
 
     init(appState: AppState) {
@@ -21,13 +22,13 @@ final class PanelController {
         switch state {
         case .recording, .transcribing:
             removeClickOutsideMonitor()
-            show(activate: false)
+            show(activate: false, compact: true)
         case .editing:
-            show(activate: true)
+            show(activate: true, compact: false)
             installClickOutsideMonitor()
         case .error:
             removeClickOutsideMonitor()
-            show(activate: false)
+            show(activate: false, compact: false)
         case .idle:
             hide()
         }
@@ -39,10 +40,19 @@ final class PanelController {
         removeClickOutsideMonitor()
         panel?.orderOut(nil)
         panel = nil
+        isCompact = nil
     }
 
-    private func show(activate: Bool) {
-        if panel == nil { panel = buildPanel() }
+    private func show(activate: Bool, compact: Bool) {
+        // If the mode changed (compact ↔ full), destroy and rebuild so the
+        // NSHostingView recalculates its intrinsic size from scratch.
+        if isCompact != compact {
+            panel?.orderOut(nil)
+            panel = nil
+        }
+        isCompact = compact
+
+        if panel == nil { panel = buildPanel(compact: compact) }
 
         if activate {
             if #available(macOS 14, *) { NSApp.activate() }
@@ -55,10 +65,17 @@ final class PanelController {
         positionPanel()
     }
 
-    private func buildPanel() -> FloatingPanel {
+    private func buildPanel(compact: Bool) -> FloatingPanel {
+        let rootView = TranscriptionView()
+            .environmentObject(appState)
+
+        let hostingView = NSHostingView(rootView: rootView)
+        // Let the hosting view calculate its ideal size from the SwiftUI content.
+        let fittingSize = hostingView.fittingSize
+
         let panel = FloatingPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 120),
-            styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
+            contentRect: NSRect(origin: .zero, size: fittingSize),
+            styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
@@ -71,10 +88,7 @@ final class PanelController {
         panel.isMovableByWindowBackground = true
         panel.hidesOnDeactivate = false
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        panel.contentView = NSHostingView(
-            rootView: TranscriptionView()
-                .environmentObject(appState)
-        )
+        panel.contentView = hostingView
         return panel
     }
 
@@ -82,7 +96,7 @@ final class PanelController {
         guard let panel = panel, let screen = NSScreen.main else { return }
         let sf = screen.visibleFrame
         let x = sf.midX - panel.frame.width / 2
-        let y = sf.minY + 48
+        let y = sf.minY + ((isCompact == true) ? 40 : 48)
         panel.setFrameOrigin(NSPoint(x: x, y: y))
     }
 

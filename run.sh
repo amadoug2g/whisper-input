@@ -1,7 +1,11 @@
 #!/bin/bash
 # Builds Memo and launches it as a proper .app bundle.
-# Preserves the existing bundle between rebuilds so that Accessibility
-# permission (granted by path) is not invalidated.
+#
+# Accessibility permission is preserved across restarts by only re-signing
+# when the binary actually changed. macOS tracks Accessibility by CDHash
+# (code signature hash) — if the binary is identical, the CDHash is
+# identical, and the TCC entry stays valid. No re-grant needed.
+#
 # Run: chmod +x run.sh && ./run.sh
 
 set -euo pipefail
@@ -9,6 +13,7 @@ set -euo pipefail
 APP_NAME="Memo"
 BUNDLE="${APP_NAME}.app"
 BINARY_SRC=".build/debug/MemoMain"
+BINARY_DEST="$BUNDLE/Contents/MacOS/$APP_NAME"
 
 echo "Building…"
 swift build 2>&1
@@ -21,12 +26,7 @@ if pgrep -xq "$APP_NAME"; then
 fi
 
 # Create bundle structure only if it doesn't exist yet.
-# Preserving the bundle across rebuilds keeps the Accessibility
-# permission that macOS tracks by bundle path.
 mkdir -p "$BUNDLE/Contents/MacOS"
-
-# Update binary (always — it may have changed)
-cp "$BINARY_SRC" "$BUNDLE/Contents/MacOS/$APP_NAME"
 
 # Write Info.plist only if missing
 if [ ! -f "$BUNDLE/Contents/Info.plist" ]; then
@@ -58,8 +58,18 @@ cat > "$BUNDLE/Contents/Info.plist" << 'PLIST'
 PLIST
 fi
 
-echo "Signing (ad-hoc)…"
-codesign --force --deep --sign - "$BUNDLE"
+# Only copy + re-sign if the binary actually changed.
+# Skipping re-sign preserves the CDHash → Accessibility TCC entry survives.
+if cmp -s "$BINARY_SRC" "$BINARY_DEST" 2>/dev/null; then
+    echo "  Binary unchanged — keeping existing signature (Accessibility stays granted)"
+else
+    echo "  Binary changed — updating and re-signing…"
+    cp "$BINARY_SRC" "$BINARY_DEST"
+    # Ad-hoc sign — required for `open` to work on modern macOS.
+    codesign --force --sign - "$BUNDLE"
+    echo "  ⚠️  If Accessibility was granted before, re-grant it once in:"
+    echo "     System Settings → Privacy & Security → Accessibility → Memo"
+fi
 
 echo "Launching…"
 open "$BUNDLE"
@@ -67,7 +77,5 @@ open "$BUNDLE"
 echo ""
 echo "Done. Look for the mic icon in your menu bar."
 echo ""
-echo "First run:"
-echo "  1. Click the mic icon → Settings → paste your OpenAI API key → Done"
-echo "  2. Hold ⌥ Space to record. Release to transcribe."
-echo "  3. Accessibility permission is requested automatically when you paste."
+echo "  Hold ⌥ Space to record — you'll see a tiny waveform pill."
+echo "  Release to transcribe."
