@@ -26,8 +26,8 @@ Config.xcconfig
 Pods/
 Podfile.lock
 
-# Claude Code
-.claude/
+# Claude Code (only ignore local secrets, not agent definitions)
+.claude/settings.local.json
 
 # App bundle build artifacts (Info.plist is tracked; binaries/resources are not)
 Memo.app/Contents/MacOS/
