@@ -1,5 +1,7 @@
 # Memo
 
+[![CI](https://github.com/amadoug2g/whisper-input/actions/workflows/ci.yml/badge.svg)](https://github.com/amadoug2g/whisper-input/actions/workflows/ci.yml)
+
 Application macOS de dictée vocale, invisible dans le Dock, qui vit dans la barre de menus. Parlez, relisez, collez : trois gestes, zéro friction.
 
 Memo enregistre votre voix via un raccourci global, envoie l'audio a l'API OpenAI Whisper, puis colle le texte transcrit dans l'application de votre choix.
