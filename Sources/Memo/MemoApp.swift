@@ -36,6 +36,7 @@ public struct MemoApp: App {
         MenuBarExtra {
             AppMenuView(
                 toggleRecording: { appDelegate.menuToggleRecording() },
+                openHistory: { appDelegate.openHistoryWindow() },
                 menuBarState: appDelegate.menuBarState
             )
         } label: {
@@ -86,6 +87,7 @@ private extension RecordingState {
 
 private struct AppMenuView: View {
     let toggleRecording: () -> Void
+    let openHistory: () -> Void
     @ObservedObject var menuBarState: MenuBarState
 
     var body: some View {
@@ -118,6 +120,10 @@ private struct AppMenuView: View {
             toggleRecording()
         }
         .disabled(menuBarState.needsSetup)
+        Divider()
+        Button("History…") {
+            openHistory()
+        }
         Divider()
         if #available(macOS 14, *) {
             SettingsLink { Text("Settings…") }

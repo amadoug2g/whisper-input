@@ -74,6 +74,9 @@ class AppState: ObservableObject {
     private let transcriber: any Transcribing
     var recordingStartedAt: Date?
 
+    /// Shared history store — holds up to 50 recent transcriptions.
+    let historyStore: HistoryStore = HistoryStore()
+
     init(
         audioRecorder: any AudioRecording = AudioRecorder(),
         transcriber: any Transcribing = WhisperService()
@@ -166,12 +169,14 @@ class AppState: ObservableObject {
         defer { try? FileManager.default.removeItem(at: audioURL) }
 
         do {
+            let language = selectedLanguage == "auto" ? nil : selectedLanguage
             let text = try await transcriber.transcribe(
                 audioURL: audioURL,
                 apiKey: openAIApiKey,
-                language: selectedLanguage == "auto" ? nil : selectedLanguage
+                language: language
             )
             transcribedText = text
+            historyStore.add(text, language: language)
             if autoPasteEnabled {
                 confirmAndPaste()
             } else {

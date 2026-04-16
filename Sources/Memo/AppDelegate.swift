@@ -16,6 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var previousApp: NSRunningApplication?
     private var stateCancellable: AnyCancellable?
     private var hotkeySettingsCancellable: AnyCancellable?
+    private var historyWindow: NSWindow?
 
     // MARK: - Launch
 
@@ -96,6 +97,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             capturePreviousApp()
             appState.startRecording()
         }
+    }
+
+    func openHistoryWindow() {
+        if let window = historyWindow, window.isVisible {
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        let view = HistoryView(historyStore: appState.historyStore)
+        let hosting = NSHostingController(rootView: view)
+        let window = NSWindow(contentViewController: hosting)
+        window.title = "Transcription History"
+        window.styleMask = [.titled, .closable, .miniaturizable]
+        window.isReleasedWhenClosed = false
+        window.center()
+        self.historyWindow = window
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 }
 
