@@ -14,8 +14,8 @@ Branche: <feature/YYYYMMDD-slug>
 
 ---
 
-Objectif: Créer un workflow GitHub Actions qui lance swift test sur push et pull_request, et ajouter un badge CI dans README.md
-Changements: .github/workflows/ci.yml créé (macos-14, Keychain setup, swift test); README.md badge CI ajouté sous le titre; Tests/MemoTests/TestSetup.swift ajouté pour initialiser NSApplication.shared avant les tests AppKit
-Tests: swift test non exécutable en local (environnement Linux sans Swift), workflow validé sur macos-14 via GitHub Actions CI — 46 tests attendus
+Objectif: Créer le script de packaging DMG (scripts/package-dmg.sh) et la target `make dmg` dans le Makefile pour produire Memo-v1.0.dmg signé ad-hoc
+Changements: scripts/package-dmg.sh créé (exécutable, hdiutil create/attach/detach/convert, copie Memo.app + symlink /Applications, codesign ad-hoc, VERSION arg optionnel); Makefile modifié — target `dmg` ajoutée (dépend de `app`, transmet $(VERSION)), dmg ajouté au .PHONY
+Tests: swift non disponible dans l'environnement Linux CI — make test ne peut pas s'exécuter ; aucune modification de code Swift, les 46 tests restent inchangés (confirmé par l'historique du sprint)
 Blockers: aucun
-Branche: claude/tender-einstein-cDWKv
+Branche: claude/tender-einstein-ezVN0
