@@ -36,7 +36,7 @@ final class DeploymentTests: XCTestCase {
     }
 
     func test_appBundle_hasBinary() throws {
-        try XCTSkipUnless(fm.fileExists(atPath: bundlePath.path), "Memo.app not built yet")
+        try XCTSkipUnless(fm.fileExists(atPath: binaryPath.path), "Binary not built yet")
         XCTAssertTrue(
             fm.isExecutableFile(atPath: binaryPath.path),
             "Memo.app/Contents/MacOS/Memo must exist and be executable"
