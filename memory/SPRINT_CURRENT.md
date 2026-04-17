@@ -10,7 +10,7 @@
 - [ ] Workflow `.github/workflows/release.yml` déclenché sur tag `v*` → Release + DMG auto
 - [ ] Landing page `docs/index.html` servie via GitHub Pages
 - [ ] README mis à jour (install instructions, screenshots, badges CI/release)
-- [ ] 46 tests verts, CI passe
+- [x] 46 tests verts, CI passe (PR #7, 2026-04-17)
 - [ ] Sprint Review + Retro dans `memory/sprints/sprint-01/`
 
 ---
