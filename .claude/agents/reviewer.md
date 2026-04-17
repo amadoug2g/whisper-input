@@ -30,20 +30,28 @@ Examine le diff avec ces critères :
 ### 4. Décision
 
 **✅ LGTM** — le code est correct et les tests passent :
-1. Crée une PR via les outils GitHub MCP disponibles :
-   - From: branche `feature/...` (lire dans CODER_SUMMARY.md)
-   - To: `main`
-   - Title: `feat: <description concise>`
-   - Body: résumé du changement + résultat des tests
-2. Ajoute une entrée dans `memory/SESSION_LOG.md` :
+1. Ajoute une entrée dans `memory/SESSION_LOG.md` :
    ```
    ## YYYY-MM-DD
    - Objectif: <objectif du jour>
    - Statut: ✅ LGTM
-   - PR: #<numéro>
    - Tests: <X passed>
    ```
-3. Commite SESSION_LOG.md sur la branche feature et pousse.
+2. Commite SESSION_LOG.md sur la branche feature et pousse.
+3. Crée une PR via les outils GitHub MCP :
+   - From: branche `feature/...` (lire dans CODER_SUMMARY.md)
+   - To: `main`
+   - Title: `feat: <description concise>`
+   - Body: résumé du changement + résultat des tests
+4. **Merge immédiatement la PR** via `mcp__github__merge_pull_request` (méthode `squash`).
+5. **Supprime la branche feature** après le merge :
+   ```bash
+   git checkout main
+   git pull origin main
+   git branch -d feature/YYYYMMDD-slug
+   git push origin --delete feature/YYYYMMDD-slug
+   ```
+6. Vérifie que `main` est à jour : `git log --oneline -1` doit montrer le squash commit.
 
 **❌ Bloquant** — problème qui empêche la fusion :
 1. Écris `memory/REVIEWER_FEEDBACK.md` avec :
