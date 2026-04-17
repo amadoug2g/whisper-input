@@ -1,7 +1,7 @@
 # Objectif du jour — 2026-04-17 (Sprint 1, J1)
 
 ## Contexte sprint
-Sprint 1 goal : Memo v1.0-rc1 telechareable depuis GitHub Release (DMG + GitHub Pages). 13 jours restants avant deadline (30 avril).
+Sprint 1 goal : Memo v1.0-rc1 telechargeable depuis GitHub Release (DMG + GitHub Pages). 13 jours restants avant deadline (30 avril).
 
 ## Tache
 Creer le script de packaging DMG et la target Makefile associee.
@@ -30,24 +30,7 @@ Note : le script doit accepter un argument optionnel `VERSION` (defaut `1.0`) po
 ## Priorite
 **Haute** — J1 du Sprint 1. Bloquant pour la GitHub Release (J2). Chemin critique vers la deadline du 30 avril.
 
-## Analyse strategique (weekly review 2026-04-17)
-
-### Bilan semaine ecoulee
-- CI GitHub Actions operationnel (PR #7) avec Keychain setup et TestSetup.swift
-- Infrastructure agents en place (coder, reviewer, manager)
-- Sprint 1 demarre, plan et backlog definis
-
-### Etat du sprint
-| Item | Statut |
-|------|--------|
-| Script DMG + `make dmg` | En cours (J1) |
-| Workflow `release.yml` | A faire (J2) |
-| Landing page `docs/index.html` | A faire (J3) |
-| GitHub Pages + README | A faire (J4) |
-| Smoke test DMG | A faire (J5) |
-| Sprint Review + Retro | A faire (J7) |
-
-### Risques identifies
-1. **Branche non mergee** : 8 commits sur `claude/affectionate-cerf-UZCzX` pas encore dans `main` (CI, sprint kickoff). A merger via PR avant J2.
-2. **Gatekeeper ad-hoc** : DMG ad-hoc sera bloque par Gatekeeper. Documenter `xattr -c Memo.app` dans README et landing page.
-3. **13 jours restants** : Sprint 1 (distribution) doit finir le 24/04 pour laisser 6 jours de polish (localisation FR, README final, v1.0 tag).
+## Blocker a resoudre en premier
+**Merger la branche `claude/affectionate-cerf-UZCzX` dans `main`.**
+9 commits (CI, sprint infra, weekly review) sont bloques sur cette branche.
+Toute la suite du sprint depend de ce merge. Creer une PR et merger avant de commencer le DMG script.
