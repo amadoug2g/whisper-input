@@ -15,7 +15,7 @@ Format par entrée :
 ## 2026-04-17
 - Objectif: Créer workflow GitHub Actions (swift test sur push+PR) et badge CI dans README.md
 - Statut: ✅ LGTM
-- PR: #TBD
+- PR: #5
 - Tests: N/A (Swift non disponible sur Linux — validation déléguée au runner macos-14)
 - Notes: ci.yml valide (YAML), triggers push+PR toutes branches, macos-14, swift test; badge README correct
 
