@@ -19,7 +19,7 @@
 
 | Jour | Objectif | Statut |
 |------|----------|--------|
-| J1 — 17/04 | Script `package-dmg.sh` + target `make dmg` | 🔄 En cours |
+| J1 — 17/04 | Script `package-dmg.sh` + target `make dmg` | Done |
 | J2 — 18/04 | Workflow `release.yml` sur tag `v*` | ⬜ À faire |
 | J3 — 20/04 | Landing page `docs/index.html` (hero, features, download CTA) | ⬜ À faire |
 | J4 — 21/04 | GitHub Pages activation + README polish | ⬜ À faire |

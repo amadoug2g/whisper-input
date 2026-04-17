@@ -48,3 +48,9 @@ Format par entrée :
   - Calendrier : J1=DMG(17/04), J2=release.yml(18/04), J3=landing(20/04), J4=README(21/04), J5=smoke(22/04), J7=review(24/04).
   - DAILY_GOAL mis a jour : DMG packaging + blocker merge branche ajoute.
   - **Blocker resolu** : PR #8 creee et mergee (squash) dans `main`. 10 commits integres. `main` est a jour.
+
+## 2026-04-17 — DMG Packaging Script (reviewer)
+- Objectif: Creer `scripts/package-dmg.sh` + target `make dmg` (Sprint 1 J1)
+- Statut: LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: Script bash correct, set -euo pipefail, nettoyage temp, validation mount. Suggestions non-bloquantes: (1) double appel make app (script + Makefile dep); (2) *.dmg absent du .gitignore.
