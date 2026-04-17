@@ -1,35 +1,29 @@
-# Objectif du jour — 2026-04-17
+# Objectif du jour — 2026-04-17 (Sprint 1, J1)
 
-## Contexte
-
-Le core de Memo est complet (46 tests, sandbox configuré, ad-hoc signing). Pour publier avant le 30 avril, la première étape est de mettre en place un pipeline CI qui valide automatiquement chaque changement. Sans CI, les agents ne peuvent pas garantir la qualité du code sur les futures branches.
+## Contexte sprint
+Sprint 1 goal : Memo v1.0-rc1 téléchargeable depuis GitHub Release (DMG + GitHub Pages).
+Voir `memory/SPRINT_CURRENT.md` pour le backlog complet.
 
 ## Tâche
+Créer le script de packaging DMG et la target Makefile associée.
 
-Créer un workflow GitHub Actions qui lance `swift test` automatiquement sur chaque push et pull request.
-
-Le workflow doit :
-1. Se déclencher sur `push` et `pull_request` (toutes branches)
-2. Tourner sur `macos-14` (Apple Silicon runner GitHub)
-3. Utiliser Swift intégré à l'image (pas besoin d'installation séparée)
-4. Lancer `swift test`
-5. Afficher clairement si les tests passent ou échouent
-
-Ajouter également un **badge CI** dans `README.md` (sous le titre `# Memo`).
+Le DMG doit :
+1. Appeler `make app` pour builder `Memo.app` (via `scripts/package-app.sh` existant)
+2. Créer un volume DMG temporaire avec `hdiutil`
+3. Y copier `Memo.app` + un lien symbolique vers `/Applications`
+4. Convertir en DMG compressé final : `Memo-v1.0.dmg`
+5. Signer ad-hoc le DMG : `codesign --force --sign - Memo-v1.0.dmg`
 
 ## Critères de succès
-
-- [ ] Fichier `.github/workflows/ci.yml` créé et valide (YAML correct)
-- [ ] `make test` passe localement (46 tests, 0 failed)
-- [ ] Badge CI ajouté dans README.md
-- [ ] Commit propre avec message `ci: add GitHub Actions swift test workflow`
-- [ ] Branche `feature/20260417-github-actions-ci` poussée sur origin
+- [ ] `scripts/package-dmg.sh` créé et exécutable
+- [ ] `make dmg` ajouté dans `Makefile` (dépend de `app`)
+- [ ] `make dmg` produit `Memo-v1.0.dmg` dans le répertoire racine
+- [ ] `make test` toujours vert (46 tests)
+- [ ] Commit : `feat: add DMG packaging script and make dmg target`
 
 ## Fichiers concernés
-
-- `.github/workflows/ci.yml` — à créer
-- `README.md` — ajouter le badge CI sous `# Memo`
+- `scripts/package-dmg.sh` — à créer
+- `Makefile` — ajouter target `dmg`
 
 ## Priorité
-
-**Haute** — bloquant pour tout le reste : les agents ne peuvent pas valider les builds sans CI.
+**Haute** — J1 du Sprint 1. Bloquant pour la GitHub Release (J2).
