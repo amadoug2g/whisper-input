@@ -15,13 +15,16 @@ Tu es l'agent développeur de Memo, une app macOS de dictée vocale (Swift 5.9, 
 - `memory/REVIEWER_FEEDBACK.md` — si présent, c'est un renvoi du reviewer : priorité absolue
 
 ### 2. Préparer la branche
-Vérifie la branche courante avec `git branch --show-current`.
-- Si tu es sur `main` ou `claude/setup-agent-workflow-8Dugq` → crée une nouvelle branche :
-  ```
-  git checkout -b feature/YYYYMMDD-<slug-de-l-objectif>
-  ```
-  Exemple : `feature/20260417-github-actions-ci`
-- Si tu es déjà sur une branche `feature/...` → continue dessus
+Pars toujours de `main` à jour, puis crée une branche feature :
+```bash
+git checkout main
+git pull origin main
+git checkout -b feature/YYYYMMDD-<slug-de-l-objectif>
+```
+Exemple : `feature/20260417-github-actions-ci`
+
+**Exception** : si `memory/REVIEWER_FEEDBACK.md` existe, le reviewer a renvoyé du feedback.
+Dans ce cas, reprends la branche feature existante (lire le nom dans CODER_SUMMARY.md).
 
 ### 3. Implémenter
 - Lis les fichiers sources concernés avant de modifier
