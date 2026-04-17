@@ -9,7 +9,7 @@
 
 ### Semaine 1 — 16-18 avril 2026 : Infrastructure CI + Distribution
 
-- [ ] **CI GitHub Actions** — workflow `swift test` sur push/PR (badge dans README)
+- [x] **CI GitHub Actions** — workflow `swift test` sur push/PR (badge dans README) -- PR #7, 2026-04-17
 - [ ] **Script DMG** — créer un DMG distribuable à partir de Memo.app
 - [ ] **GitHub Actions release** — build + package automatique sur tag `v*`
 
