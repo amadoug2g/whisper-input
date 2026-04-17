@@ -47,3 +47,4 @@ Format par entrée :
   - DMG script (`scripts/package-dmg.sh`) pas encore cree — reste J1 priorite haute.
   - Calendrier : J1=DMG(17/04), J2=release.yml(18/04), J3=landing(20/04), J4=README(21/04), J5=smoke(22/04), J7=review(24/04).
   - DAILY_GOAL mis a jour : DMG packaging + blocker merge branche ajoute.
+  - **Blocker resolu** : PR #8 creee et mergee (squash) dans `main`. 10 commits integres. `main` est a jour.
