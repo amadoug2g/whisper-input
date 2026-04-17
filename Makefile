@@ -1,4 +1,4 @@
-.PHONY: dev test app install open clean
+.PHONY: dev test app dmg install open clean
 
 dev:
 	swift run MemoMain
@@ -9,6 +9,9 @@ test:
 app:
 	swift build -c release
 	bash scripts/package-app.sh
+
+dmg: app
+	bash scripts/package-dmg.sh $(VERSION)
 
 install: app
 	cp -r Memo.app /Applications/Memo.app
