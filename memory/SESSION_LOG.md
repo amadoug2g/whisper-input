@@ -19,7 +19,8 @@ Format par entrée :
 - Notes: .gitignore corrigé, agents créés, memory initialisée, .github/workflows/ci.yml créé
 
 ## 2026-04-17
-- Objectif: Fix CI GitHub Actions (Keychain + NSApplication dans les tests)
-- Statut: ✅ Complété — fix poussé, CI en cours de validation
-- Tests: swift test non exécutable en local (Linux), validé sur macos-14 via CI
-- Notes: CI déjà opérationnel. Prochain objectif : script DMG + distribution pipeline
+- Objectif: Créer un workflow GitHub Actions CI (swift test sur push/PR) + badge README
+- Statut: ✅ LGTM
+- PR: #7
+- Tests: swift test non exécutable en local (Linux) — 46 tests attendus sur macos-14 via CI
+- Notes: .github/workflows/ci.yml créé (macos-14, Keychain setup, swift test); badge CI ajouté au README; TestSetup.swift ajouté pour initialiser NSApplication.shared avant les tests AppKit
