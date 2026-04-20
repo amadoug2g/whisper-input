@@ -54,3 +54,9 @@ Format par entrée :
 - Statut: LGTM
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: Script bash correct, set -euo pipefail, nettoyage temp, validation mount. Suggestions non-bloquantes: (1) double appel make app (script + Makefile dep); (2) *.dmg absent du .gitignore.
+
+## 2026-04-20
+- Objectif: Workflow `release.yml` (J2) + landing page `docs/index.html` (J3) — Sprint 1
+- Statut: LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: release.yml declenche sur tag v*, version extraite via GITHUB_REF_NAME, make dmg VERSION=X, softprops/action-gh-release@v2 publie le DMG. Landing page HTML statique avec hero, features grid, how-it-works, download CTA vers releases/latest. Suggestion non-bloquante: CTA pointe vers Memo-v1.0.dmg en dur — pas de rupture pour v1.0 mais a mettre a jour pour les releases suivantes.

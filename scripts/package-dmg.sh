@@ -13,11 +13,8 @@ DMG_PATH="$REPO/$DMG_NAME"
 VOLUME_NAME="Memo ${VERSION}"
 TMP_DMG="$REPO/tmp-memo-build.dmg"
 
-echo "→ Building Memo.app (make app)"
-make -C "$REPO" app
-
 if [ ! -d "$APP" ]; then
-  echo "Error: Memo.app not found at $APP after make app" >&2
+  echo "Error: Memo.app not found at $APP — run 'make app' first" >&2
   exit 1
 fi
 

@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-and-release:
+    name: Build DMG and publish release
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup test Keychain
+        run: |
+          security create-keychain -p "" build.keychain
+          security list-keychains -d user -s build.keychain $(security list-keychains -d user | tr -d '"' | xargs)
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings -t 3600 -l build.keychain
+
+      - name: Build app and create DMG
+        run: make dmg VERSION=${{ steps.version.outputs.version }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Memo v${{ steps.version.outputs.version }}"
+          body: |
+            ## Memo v${{ steps.version.outputs.version }}
+
+            ### Install
+            1. Download `Memo-v${{ steps.version.outputs.version }}.dmg`
+            2. Open the DMG, drag **Memo** to Applications
+            3. Launch Memo from Spotlight or Applications
+            4. Add your OpenAI API key in Settings
+
+            ### Requirements
+            - macOS 13 Ventura or later
+            - OpenAI API key (for Whisper transcription)
+          files: Memo-v${{ steps.version.outputs.version }}.dmg
+          draft: false
+          prerelease: false

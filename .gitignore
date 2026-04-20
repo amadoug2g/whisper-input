@@ -33,3 +33,6 @@ Podfile.lock
 Memo.app/Contents/MacOS/
 Memo.app/Contents/Resources/
 Memo.app/Contents/_CodeSignature/
+
+# DMG release artifacts
+*.dmg

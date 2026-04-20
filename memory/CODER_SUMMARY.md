@@ -14,8 +14,8 @@ Branche: <feature/YYYYMMDD-slug>
 
 ---
 
-Objectif: Créer le script de packaging DMG (scripts/package-dmg.sh) et la target `make dmg` dans le Makefile pour produire Memo-v1.0.dmg signé ad-hoc
-Changements: scripts/package-dmg.sh créé (exécutable, hdiutil create/attach/detach/convert, copie Memo.app + symlink /Applications, codesign ad-hoc, VERSION arg optionnel); Makefile modifié — target `dmg` ajoutée (dépend de `app`, transmet $(VERSION)), dmg ajouté au .PHONY
-Tests: swift non disponible dans l'environnement Linux CI — make test ne peut pas s'exécuter ; aucune modification de code Swift, les 46 tests restent inchangés (confirmé par l'historique du sprint)
+Objectif: Sprint 1 J2 + J3 — créer le workflow release.yml (déclenché sur tag v*) et la landing page docs/index.html (hero, features, download CTA)
+Changements: .github/workflows/release.yml créé (déclenché sur push v*, extrait la version du tag, make dmg VERSION=X, publie GitHub Release avec le DMG via softprops/action-gh-release@v2); docs/index.html déjà présent et commité (94530bd) — hero section, features grid, how-it-works steps, footer, CTA de téléchargement pointant vers la release latest
+Tests: swift non disponible dans l'environnement Linux CI — make test ne peut pas s'exécuter ; aucune modification de code Swift, les 46 tests restent inchangés
 Blockers: aucun
-Branche: claude/tender-einstein-ezVN0
+Branche: claude/tender-einstein-F4iBX
