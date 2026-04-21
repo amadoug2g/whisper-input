@@ -60,3 +60,9 @@ Format par entrée :
 - Statut: LGTM
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: release.yml declenche sur tag v*, version extraite via GITHUB_REF_NAME, make dmg VERSION=X, softprops/action-gh-release@v2 publie le DMG. Landing page HTML statique avec hero, features grid, how-it-works, download CTA vers releases/latest. Suggestion non-bloquante: CTA pointe vers Memo-v1.0.dmg en dur — pas de rupture pour v1.0 mais a mettre a jour pour les releases suivantes.
+
+## 2026-04-21
+- Objectif: GitHub Pages activation + README polish (Sprint 1 J4)
+- Statut: ✅ LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: pages.yml cree — deploie docs/ sur GitHub Pages a chaque push sur main avec filtre path docs/**, plus workflow_dispatch. Permissions minimales (contents:read, pages:write, id-token:write), concurrency guard, actions a jour. README: badges CI/release/macOS/license, section Telecharger avec lien DMG direct, Screenshots placeholder (J5), make dmg dans les commandes, test count 27→46, roadmap mise a jour (DMG/release.yml/landing page coches). Suggestion non-bloquante: le filtre path docs/** sur pages.yml est intentionnel et correct; le lien DMG reste fixe a Memo-v1.0.dmg, cohérent avec release.yml.

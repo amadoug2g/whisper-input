@@ -14,8 +14,8 @@ Branche: <feature/YYYYMMDD-slug>
 
 ---
 
-Objectif: Sprint 1 J2 + J3 — créer le workflow release.yml (déclenché sur tag v*) et la landing page docs/index.html (hero, features, download CTA)
-Changements: .github/workflows/release.yml créé (déclenché sur push v*, extrait la version du tag, make dmg VERSION=X, publie GitHub Release avec le DMG via softprops/action-gh-release@v2); docs/index.html déjà présent et commité (94530bd) — hero section, features grid, how-it-works steps, footer, CTA de téléchargement pointant vers la release latest
+Objectif: Sprint 1 J4 — GitHub Pages activation + README polish
+Changements: .github/workflows/pages.yml créé (déploie docs/ sur GitHub Pages à chaque push sur main, utilise actions/configure-pages@v5 + actions/upload-pages-artifact@v3 + actions/deploy-pages@v4, déclenchement aussi via workflow_dispatch); README.md entièrement reécrit avec badges CI/release/macOS/license, section Télécharger avec lien DMG direct, flow ASCII, liste des fonctionnalités, tableau pile technique, structure du projet, instructions installation, section Tests (46 tests), feuille de route; memory/SPRINT_CURRENT.md mis à jour (J4 marqué Done)
 Tests: swift non disponible dans l'environnement Linux CI — make test ne peut pas s'exécuter ; aucune modification de code Swift, les 46 tests restent inchangés
 Blockers: aucun
-Branche: claude/tender-einstein-F4iBX
+Branche: claude/tender-einstein-0F3is
