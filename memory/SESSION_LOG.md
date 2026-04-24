@@ -66,3 +66,9 @@ Format par entrée :
 - Statut: ✅ LGTM
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: pages.yml cree — deploie docs/ sur GitHub Pages a chaque push sur main avec filtre path docs/**, plus workflow_dispatch. Permissions minimales (contents:read, pages:write, id-token:write), concurrency guard, actions a jour. README: badges CI/release/macOS/license, section Telecharger avec lien DMG direct, Screenshots placeholder (J5), make dmg dans les commandes, test count 27→46, roadmap mise a jour (DMG/release.yml/landing page coches). Suggestion non-bloquante: le filtre path docs/** sur pages.yml est intentionnel et correct; le lien DMG reste fixe a Memo-v1.0.dmg, cohérent avec release.yml.
+
+## 2026-04-24
+- Objectif: Sprint 1 J7 — Sprint Review + Rétrospective
+- Statut: ✅ Done
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: memory/sprints/sprint-01/SPRINT_REVIEW.md et RETRO.md créés (DoD 6/6, score sprint 23/25). *.dmg ajouté au .gitignore. SPRINT_CURRENT.md mis à jour (J7 Done, tous les DoD items cochés). Sprint 1 terminé — prochaines étapes: smoke test macOS, tag v1.0.

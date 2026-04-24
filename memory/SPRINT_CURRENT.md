@@ -24,7 +24,7 @@
 | J3 — 20/04 | Landing page `docs/index.html` (hero, features, download CTA) | Done |
 | J4 — 21/04 | GitHub Pages activation + README polish | Done |
 | J5 — 22/04 | Screenshots + smoke test DMG sur macOS | ⬜ À faire |
-| J7 — 24/04 | Sprint Review + Rétrospective | ⬜ À faire |
+| J7 — 24/04 | Sprint Review + Rétrospective | Done |
 
 ---
 
