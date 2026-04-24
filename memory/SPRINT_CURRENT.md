@@ -6,12 +6,12 @@
 
 ## Definition of Done
 
-- [ ] `scripts/package-dmg.sh` + `make dmg` → DMG local fonctionnel
-- [ ] Workflow `.github/workflows/release.yml` déclenché sur tag `v*` → Release + DMG auto
-- [ ] Landing page `docs/index.html` servie via GitHub Pages
-- [ ] README mis à jour (install instructions, screenshots, badges CI/release)
+- [x] `scripts/package-dmg.sh` + `make dmg` → DMG local fonctionnel (J1, 2026-04-17)
+- [x] Workflow `.github/workflows/release.yml` déclenché sur tag `v*` → Release + DMG auto (J2, 2026-04-20)
+- [x] Landing page `docs/index.html` servie via GitHub Pages (J3, 2026-04-20)
+- [x] README mis à jour (install instructions, screenshots, badges CI/release) (J4, 2026-04-21)
 - [x] 46 tests verts, CI passe (PR #7, 2026-04-17)
-- [ ] Sprint Review + Retro dans `memory/sprints/sprint-01/`
+- [x] Sprint Review + Retro dans `memory/sprints/sprint-01/` (J7, 2026-04-24)
 
 ---
 
@@ -24,7 +24,7 @@
 | J3 — 20/04 | Landing page `docs/index.html` (hero, features, download CTA) | Done |
 | J4 — 21/04 | GitHub Pages activation + README polish | Done |
 | J5 — 22/04 | Screenshots + smoke test DMG sur macOS | ⬜ À faire |
-| J7 — 24/04 | Sprint Review + Rétrospective | ⬜ À faire |
+| J7 — 24/04 | Sprint Review + Rétrospective | Done |
 
 ---
 
