@@ -14,8 +14,8 @@ Branche: <feature/YYYYMMDD-slug>
 
 ---
 
-Objectif: Sprint 1 J7 — Sprint Review + Rétrospective (fin de sprint)
-Changements: memory/sprints/sprint-01/SPRINT_REVIEW.md créé (bilan DoD 6/6, métriques sprint, items non livrés, prochaines étapes); memory/sprints/sprint-01/RETRO.md créé (Keep/Improve/Add, score 23/25, décisions Sprint 2); .gitignore: *.dmg et tmp-memo-build.dmg ajoutés; memory/SPRINT_CURRENT.md: J7 marqué Done (tous les DoD items cochés); memory/SESSION_LOG.md: entrée 2026-04-24 ajoutée
-Tests: swift non disponible dans l'environnement Linux CI — make test ne peut pas s'exécuter ; aucune modification de code Swift, les 46 tests restent inchangés
-Blockers: aucun
-Branche: claude/tender-einstein-WTyUR
+Objectif: Sprint 2 J1 — Finaliser la pre-release checklist, verifier tous les artefacts de distribution, merger les changements memory/ et s'assurer que la branche est propre et prete pour le tag v1.0 (J2)
+Changements: memory/sprints/sprint-02/PLAN.md — DoD items 1 (*.dmg .gitignore) et 2 (ROADMAP.md a jour) coches avec dates de verification ; memory/SESSION_LOG.md — note ajoutee sur la mise a jour du PLAN.md sprint-02. Tous les artefacts critiques confirmes OK : .gitignore ligne 38, release.yml (trigger v*, macos-14, softprops/action-gh-release@v2), pages.yml (push main + docs/**, permissions minimales), docs/index.html CTA (releases/latest/download/Memo-v1.0.dmg), ROADMAP.md (Sprint 1 items coches), CHANGELOG.md (v1.0 complet).
+Tests: swift non disponible dans l'environnement Linux CI — make test ne peut pas s'executer ; aucune modification de code Swift, les 46 tests restent inchanges
+Blockers: aucun — branche claude/tender-einstein-f2bwP est 5 commits ahead de main avec tous les changements Sprint 2 J1 ; le repo est pret pour le tag v1.0 le J2 (28 avril) apres merge dans main par le reviewer
+Branche: claude/tender-einstein-f2bwP

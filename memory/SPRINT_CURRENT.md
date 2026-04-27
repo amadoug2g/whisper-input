@@ -19,7 +19,7 @@
 
 | Jour | Objectif | Statut |
 |------|----------|--------|
-| J1 -- 27/04 | Pre-release checklist : .gitignore fix, ROADMAP update, verifier release.yml et pages.yml, preparer changelog | En cours |
+| J1 -- 27/04 | Pre-release checklist : .gitignore fix, ROADMAP update, verifier release.yml et pages.yml, preparer changelog | Done |
 | J2 -- 28/04 | Pousser tag `v1.0`, verifier GitHub Release + DMG attache | A faire |
 | J3 -- 29/04 | Verifier GitHub Pages live, smoke test liens, correctifs derniere minute si besoin | A faire |
 

@@ -6,12 +6,12 @@
 
 ## Definition of Done
 
-- [ ] `*.dmg` ajoute au `.gitignore`
-- [ ] ROADMAP.md a jour (items Sprint 1 coches)
-- [ ] Tag `v1.0` pousse sur `main` -> workflow `release.yml` declenche
-- [ ] GitHub Release `v1.0` visible publiquement avec `Memo-v1.0.dmg` attache
-- [ ] GitHub Pages sert `docs/index.html`
-- [ ] Lien de telechargement sur la landing page pointe vers une release existante
+- [x] `*.dmg` ajoute au `.gitignore` -- confirme ligne 38 .gitignore -- 2026-04-27
+- [x] ROADMAP.md a jour (items Sprint 1 coches) -- confirme 2026-04-27
+- [ ] Tag `v1.0` pousse sur `main` -> workflow `release.yml` declenche -- J2
+- [ ] GitHub Release `v1.0` visible publiquement avec `Memo-v1.0.dmg` attache -- J2
+- [ ] GitHub Pages sert `docs/index.html` -- J3
+- [ ] Lien de telechargement sur la landing page pointe vers une release existante -- J3
 
 ---
 
