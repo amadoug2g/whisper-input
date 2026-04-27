@@ -99,3 +99,10 @@ Format par entrée :
   - `memory/sprints/sprint-02/PLAN.md` : DoD items 1 et 2 coches (*.dmg .gitignore + ROADMAP a jour).
   - Branche : `claude/tender-einstein-f2bwP`.
   - Prochain : J2 (28/04) — pousser le tag `v1.0` sur main.
+
+## 2026-04-27 — Sprint 2 J1 — Review (reviewer)
+- Objectif: Valider la pre-release checklist et merger les changements memory/ dans main
+- Statut: ✅ LGTM
+- PR: feat: Sprint 2 J1 — pre-release checklist complete, CHANGELOG v1.0 added
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: Tous les artefacts confirmes OK (.gitignore ligne 38, release.yml, pages.yml, docs/index.html CTA, ROADMAP.md, CHANGELOG.md cree). Sprint 2 J1 marque Done. Branche claude/tender-einstein-f2bwP mergee dans main.
