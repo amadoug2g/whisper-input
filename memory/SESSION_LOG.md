@@ -96,5 +96,6 @@ Format par entrée :
   - Verification complete des artefacts : `.gitignore` (*.dmg ligne 38 OK), `release.yml` (trigger v*, macos-14, make dmg, softprops/action-gh-release@v2 OK), `pages.yml` (trigger push main + docs/**, permissions minimales OK), `docs/index.html` (CTA pointe vers releases/latest/download/Memo-v1.0.dmg OK), `ROADMAP.md` (items Sprint 1 coches OK).
   - `CHANGELOG.md` cree pour v1.0 (features, config, distribution, technique).
   - `SPRINT_CURRENT.md` : J1 marque Done.
+  - `memory/sprints/sprint-02/PLAN.md` : DoD items 1 et 2 coches (*.dmg .gitignore + ROADMAP a jour).
   - Branche : `claude/tender-einstein-f2bwP`.
   - Prochain : J2 (28/04) — pousser le tag `v1.0` sur main.
