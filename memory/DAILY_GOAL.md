@@ -1,36 +1,35 @@
-# Objectif du jour — 2026-04-17 (Sprint 1, J1)
+# Objectif du jour -- 2026-04-27 (Sprint 2, J1)
 
 ## Contexte sprint
-Sprint 1 goal : Memo v1.0-rc1 telechargeable depuis GitHub Release (DMG + GitHub Pages). 13 jours restants avant deadline (30 avril).
+Sprint 2 goal : Pousser le tag v1.0 et verifier que la GitHub Release + GitHub Pages sont live avant le 30 avril 2026. 3 jours restants.
 
 ## Tache
-Creer le script de packaging DMG et la target Makefile associee.
+Pre-release checklist : preparer le repo pour le tag v1.0.
 
-Le DMG doit :
-1. Appeler `make app` pour builder `Memo.app` (via `scripts/package-app.sh` existant)
-2. Creer un volume DMG temporaire avec `hdiutil`
-3. Y copier `Memo.app` + un lien symbolique vers `/Applications`
-4. Convertir en DMG compresse final : `Memo-v1.0.dmg`
-5. Signer ad-hoc le DMG : `codesign --force --sign - Memo-v1.0.dmg`
+Actions concretes :
+1. Ajouter `*.dmg` au `.gitignore` (fix identifie en retro Sprint 1)
+2. Verifier que `.github/workflows/release.yml` est correct et fonctionnel (lire le fichier, valider la syntaxe)
+3. Verifier que `.github/workflows/pages.yml` est correct
+4. Verifier que `docs/index.html` a un lien de telechargement fonctionnel (pointe vers `releases/latest`)
+5. Preparer un CHANGELOG minimal pour la release v1.0 (section "What's New" pour le body de la GitHub Release)
+6. S'assurer que `main` est propre et a jour avec le remote
 
-Note : le script doit accepter un argument optionnel `VERSION` (defaut `1.0`) pour nommer le DMG `Memo-v$VERSION.dmg`. Le workflow release.yml (J2) extraira la version du tag git.
+Ne PAS pousser le tag aujourd'hui -- J2 demain. Aujourd'hui = verification et preparation uniquement.
 
 ## Criteres de succes
-- [ ] `scripts/package-dmg.sh` cree et executable
-- [ ] `make dmg` ajoute dans `Makefile` (depend de `app`)
-- [ ] `make dmg` produit `Memo-v1.0.dmg` dans le repertoire racine
-- [ ] `make test` toujours vert (46 tests)
-- [ ] Commit : `feat: add DMG packaging script and make dmg target`
+- [ ] `*.dmg` present dans `.gitignore`
+- [ ] `release.yml` verifie (syntaxe, trigger `v*`, DMG build, softprops/action-gh-release)
+- [ ] `pages.yml` verifie (trigger, permissions, deploiement docs/)
+- [ ] `docs/index.html` lien CTA verifie
+- [ ] Commit pre-release pousse sur `main`
 
 ## Fichiers concernes
-- `scripts/package-dmg.sh` — a creer (hdiutil create/convert, codesign)
-- `Makefile` — ajouter target `dmg` (depend de `app`)
-- `scripts/package-app.sh` — reference existante (ne pas modifier)
+- `.gitignore` -- ajouter `*.dmg`
+- `.github/workflows/release.yml` -- lecture et verification
+- `.github/workflows/pages.yml` -- lecture et verification
+- `docs/index.html` -- verification lien CTA
+- `memory/ROADMAP.md` -- mise a jour items coches (fait par manager)
+- `memory/SPRINT_CURRENT.md` -- nouveau sprint (fait par manager)
 
 ## Priorite
-**Haute** — J1 du Sprint 1. Bloquant pour la GitHub Release (J2). Chemin critique vers la deadline du 30 avril.
-
-## Blocker a resoudre en premier
-**Merger la branche `claude/affectionate-cerf-UZCzX` dans `main`.**
-9 commits (CI, sprint infra, weekly review) sont bloques sur cette branche.
-Toute la suite du sprint depend de ce merge. Creer une PR et merger avant de commencer le DMG script.
+**Haute** -- Deadline dans 3 jours. Regle #3 : uniquement distribution. Tout doit etre pret pour pousser le tag v1.0 demain (J2).

@@ -72,3 +72,18 @@ Format par entrée :
 - Statut: ✅ Done
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: memory/sprints/sprint-01/SPRINT_REVIEW.md et RETRO.md créés (DoD 6/6, score sprint 23/25). *.dmg ajouté au .gitignore. SPRINT_CURRENT.md mis à jour (J7 Done, tous les DoD items cochés). Sprint 1 terminé — prochaines étapes: smoke test macOS, tag v1.0.
+
+## 2026-04-27 — Weekly Strategic Review (manager)
+- Objectif: Revue strategique hebdomadaire — cloture Sprint 1, lancement Sprint 2
+- Statut: ✅ Review completee
+- Tests: N/A
+- Notes:
+  - **3 jours restants avant deadline (30 avril 2026)**
+  - Sprint 1 termine (6/6 DoD). Archive dans `memory/sprints/sprint-01/`. Retro et review deja faites le 24/04.
+  - Sprint 2 demarre : "Ship v1.0 Final Release" (27-30 avril, 3 jours).
+  - ROADMAP.md mis a jour (items Sprint 1 tous coches, localisation FR reportee hors v1.0).
+  - Backlog Sprint 2 : J1=pre-release checklist, J2=push tag v1.0, J3=verification Pages+liens.
+  - **Risque principal** : release.yml jamais testee, pas de macOS pour smoke test.
+  - **Decision** : regle #3 appliquee (deadline < 7 jours -> uniquement distribution).
+  - **Aucun tag v1.0 pousse** — ca reste l'action critique de J2 (28 avril).
+  - Branche courante : `claude/affectionate-cerf-gMClj` (meme commit que `main`).
