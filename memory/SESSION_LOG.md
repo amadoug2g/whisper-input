@@ -87,3 +87,14 @@ Format par entrée :
   - **Decision** : regle #3 appliquee (deadline < 7 jours -> uniquement distribution).
   - **Aucun tag v1.0 pousse** — ca reste l'action critique de J2 (28 avril).
   - Branche courante : `claude/affectionate-cerf-gMClj` (meme commit que `main`).
+
+## 2026-04-27 — Sprint 2 J1 — Pre-release checklist (coder)
+- Objectif: Finaliser la pre-release checklist, verifier tous les artefacts de distribution, preparer le changelog
+- Statut: Done
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes:
+  - Verification complete des artefacts : `.gitignore` (*.dmg ligne 38 OK), `release.yml` (trigger v*, macos-14, make dmg, softprops/action-gh-release@v2 OK), `pages.yml` (trigger push main + docs/**, permissions minimales OK), `docs/index.html` (CTA pointe vers releases/latest/download/Memo-v1.0.dmg OK), `ROADMAP.md` (items Sprint 1 coches OK).
+  - `CHANGELOG.md` cree pour v1.0 (features, config, distribution, technique).
+  - `SPRINT_CURRENT.md` : J1 marque Done.
+  - Branche : `claude/tender-einstein-f2bwP`.
+  - Prochain : J2 (28/04) — pousser le tag `v1.0` sur main.
