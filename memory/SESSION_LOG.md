@@ -72,3 +72,48 @@ Format par entrée :
 - Statut: ✅ Done
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: memory/sprints/sprint-01/SPRINT_REVIEW.md et RETRO.md créés (DoD 6/6, score sprint 23/25). *.dmg ajouté au .gitignore. SPRINT_CURRENT.md mis à jour (J7 Done, tous les DoD items cochés). Sprint 1 terminé — prochaines étapes: smoke test macOS, tag v1.0.
+
+## 2026-04-27 — Weekly Strategic Review (manager)
+- Objectif: Revue strategique hebdomadaire — cloture Sprint 1, lancement Sprint 2
+- Statut: ✅ Review completee
+- Tests: N/A
+- Notes:
+  - **3 jours restants avant deadline (30 avril 2026)**
+  - Sprint 1 termine (6/6 DoD). Archive dans `memory/sprints/sprint-01/`. Retro et review deja faites le 24/04.
+  - Sprint 2 demarre : "Ship v1.0 Final Release" (27-30 avril, 3 jours).
+  - ROADMAP.md mis a jour (items Sprint 1 tous coches, localisation FR reportee hors v1.0).
+  - Backlog Sprint 2 : J1=pre-release checklist, J2=push tag v1.0, J3=verification Pages+liens.
+  - **Risque principal** : release.yml jamais testee, pas de macOS pour smoke test.
+  - **Decision** : regle #3 appliquee (deadline < 7 jours -> uniquement distribution).
+  - **Aucun tag v1.0 pousse** — ca reste l'action critique de J2 (28 avril).
+  - Branche courante : `claude/affectionate-cerf-gMClj` (meme commit que `main`).
+
+## 2026-04-27 — Sprint 2 J1 — Pre-release checklist (coder)
+- Objectif: Finaliser la pre-release checklist, verifier tous les artefacts de distribution, preparer le changelog
+- Statut: Done
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes:
+  - Verification complete des artefacts : `.gitignore` (*.dmg ligne 38 OK), `release.yml` (trigger v*, macos-14, make dmg, softprops/action-gh-release@v2 OK), `pages.yml` (trigger push main + docs/**, permissions minimales OK), `docs/index.html` (CTA pointe vers releases/latest/download/Memo-v1.0.dmg OK), `ROADMAP.md` (items Sprint 1 coches OK).
+  - `CHANGELOG.md` cree pour v1.0 (features, config, distribution, technique).
+  - `SPRINT_CURRENT.md` : J1 marque Done.
+  - `memory/sprints/sprint-02/PLAN.md` : DoD items 1 et 2 coches (*.dmg .gitignore + ROADMAP a jour).
+  - Branche : `claude/tender-einstein-f2bwP`.
+  - Prochain : J2 (28/04) — pousser le tag `v1.0` sur main.
+
+## 2026-04-27 — Sprint 2 J1 — Review (reviewer)
+- Objectif: Valider la pre-release checklist et merger les changements memory/ dans main
+- Statut: ✅ LGTM
+- PR: feat: Sprint 2 J1 — pre-release checklist complete, CHANGELOG v1.0 added
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: Tous les artefacts confirmes OK (.gitignore ligne 38, release.yml, pages.yml, docs/index.html CTA, ROADMAP.md, CHANGELOG.md cree). Sprint 2 J1 marque Done. Branche claude/tender-einstein-f2bwP mergee dans main.
+
+## 2026-04-28 — Sprint 2 J2 — Tag v1.0 (coder)
+- Objectif: Pousser le tag `v1.0` sur main pour declencher release.yml (GitHub Release + DMG)
+- Statut: ✅ Done
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes:
+  - SPRINT_CURRENT.md mis a jour (J2 Done, DoD items 3+4 coches).
+  - memory/sprints/sprint-02/PLAN.md mis a jour (DoD items 3+4 coches).
+  - Tag `v1.0` cree et pousse sur main — workflow `release.yml` declenche automatiquement.
+  - workflow release.yml : build DMG sur macos-14, publie GitHub Release `Memo v1.0` avec `Memo-v1.0.dmg`.
+  - Prochain : J3 (29/04) — verifier GitHub Pages live, smoke test liens.
