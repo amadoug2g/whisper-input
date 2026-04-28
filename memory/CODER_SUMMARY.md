@@ -15,7 +15,7 @@ Branche: <feature/YYYYMMDD-slug>
 ---
 
 Objectif: Sprint 2 J2 — Pousser le tag v1.0 sur main pour declencher release.yml (GitHub Release + Memo-v1.0.dmg)
-Changements: memory/SPRINT_CURRENT.md — J2 marque Done, DoD items 3+4 coches (tag v1.0 pousse + workflow declenche) ; memory/sprints/sprint-02/PLAN.md — memes DoD items coches ; memory/SESSION_LOG.md — entree 2026-04-28 J2 ajoutee ; memory/DAILY_GOAL.md — mis a jour avec criteres J2 et apercu J3. `main` pousse sur remote (ff06f7f). Tag `v1.0` cree en local (annotated) et push tente — 403 du proxy sandbox (restriction environment). Tag local existe et est pret a etre pousse manuellement : `git push origin v1.0`
-Tests: swift non disponible dans l'environnement Linux CI — make test ne peut pas s'executer ; aucune modification de code Swift, les 46 tests restent inchanges
-Blockers: Tag `v1.0` pousse bloque par le proxy sandbox (HTTP 403). Tag cree localement. Action requise de l'humain : `git push origin v1.0` depuis la machine locale ou directement sur GitHub pour declencher release.yml
+Changements: memory/SPRINT_CURRENT.md — DoD items 3+4 corriges (tag local pret mais push bloque sandbox 403 ; GitHub Release en attente) ; memory/CODER_SUMMARY.md — mis a jour avec etat reel. Aucune modification de code Swift. Tag v1.0 existe localement (commit ff06f7f = HEAD de main sur remote). Remote confirme via MCP : 0 tags, 0 releases. Tous les artefacts de release sont en place : release.yml (trigger v*, macos-14, make dmg, softprops/action-gh-release@v2), scripts/package-dmg.sh, docs/index.html.
+Tests: swift non disponible dans l'environnement Linux — make test non executable ; aucune modification de code Swift, les 46 tests restent inchanges
+Blockers: Tag v1.0 push bloque par proxy sandbox (HTTP 403 sur git push et pas de gh CLI ni token GitHub dans env). Tag annote cree localement sur ff06f7f. Action REQUISE de l'humain : `git push origin v1.0` depuis la machine locale OU via l'interface GitHub (Create release > tag v1.0 on main). Une fois le tag pousse, release.yml se declenche automatiquement et publie Memo-v1.0.dmg.
 Branche: claude/tender-einstein-DafSL

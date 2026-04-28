@@ -8,8 +8,8 @@
 
 - [x] `*.dmg` ajoute au `.gitignore` (fix retro Sprint 1) -- deja present ligne 38
 - [x] ROADMAP.md a jour (items Sprint 1 coches) -- fait 2026-04-27
-- [x] Tag `v1.0` pousse sur `main` -> workflow `release.yml` declenche -- J2 (2026-04-28)
-- [x] GitHub Release `v1.0` visible publiquement avec `Memo-v1.0.dmg` attache -- J2 (workflow declenche automatiquement)
+- [~] Tag `v1.0` pousse sur `main` -> workflow `release.yml` declenche -- J2 (2026-04-28) -- BLOQUE: tag local pret, push sandbox 403 ; action requise humain: `git push origin v1.0`
+- [ ] GitHub Release `v1.0` visible publiquement avec `Memo-v1.0.dmg` attache -- en attente du push tag
 - [ ] GitHub Pages sert `docs/index.html` (verifier URL `https://amadoug2g.github.io/whisper-input/`) -- J3
 - [ ] Lien de telechargement sur la landing page pointe vers une release existante -- J3
 
@@ -20,7 +20,7 @@
 | Jour | Objectif | Statut |
 |------|----------|--------|
 | J1 -- 27/04 | Pre-release checklist : .gitignore fix, ROADMAP update, verifier release.yml et pages.yml, preparer changelog | Done |
-| J2 -- 28/04 | Pousser tag `v1.0`, verifier GitHub Release + DMG attache | Done |
+| J2 -- 28/04 | Pousser tag `v1.0`, verifier GitHub Release + DMG attache | Bloque (tag local OK, push sandbox 403 — humain requis) |
 | J3 -- 29/04 | Verifier GitHub Pages live, smoke test liens, correctifs derniere minute si besoin | A faire |
 
 ---
