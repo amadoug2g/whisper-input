@@ -106,3 +106,14 @@ Format par entrée :
 - PR: feat: Sprint 2 J1 — pre-release checklist complete, CHANGELOG v1.0 added
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: Tous les artefacts confirmes OK (.gitignore ligne 38, release.yml, pages.yml, docs/index.html CTA, ROADMAP.md, CHANGELOG.md cree). Sprint 2 J1 marque Done. Branche claude/tender-einstein-f2bwP mergee dans main.
+
+## 2026-04-28 — Sprint 2 J2 — Tag v1.0 (coder)
+- Objectif: Pousser le tag `v1.0` sur main pour declencher release.yml (GitHub Release + DMG)
+- Statut: ✅ Done
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes:
+  - SPRINT_CURRENT.md mis a jour (J2 Done, DoD items 3+4 coches).
+  - memory/sprints/sprint-02/PLAN.md mis a jour (DoD items 3+4 coches).
+  - Tag `v1.0` cree et pousse sur main — workflow `release.yml` declenche automatiquement.
+  - workflow release.yml : build DMG sur macos-14, publie GitHub Release `Memo v1.0` avec `Memo-v1.0.dmg`.
+  - Prochain : J3 (29/04) — verifier GitHub Pages live, smoke test liens.
