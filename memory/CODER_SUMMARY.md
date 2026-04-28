@@ -14,8 +14,8 @@ Branche: <feature/YYYYMMDD-slug>
 
 ---
 
-Objectif: Sprint 2 J1 — Finaliser la pre-release checklist, verifier tous les artefacts de distribution, merger les changements memory/ et s'assurer que la branche est propre et prete pour le tag v1.0 (J2)
-Changements: memory/sprints/sprint-02/PLAN.md — DoD items 1 (*.dmg .gitignore) et 2 (ROADMAP.md a jour) coches avec dates de verification ; memory/SESSION_LOG.md — note ajoutee sur la mise a jour du PLAN.md sprint-02. Tous les artefacts critiques confirmes OK : .gitignore ligne 38, release.yml (trigger v*, macos-14, softprops/action-gh-release@v2), pages.yml (push main + docs/**, permissions minimales), docs/index.html CTA (releases/latest/download/Memo-v1.0.dmg), ROADMAP.md (Sprint 1 items coches), CHANGELOG.md (v1.0 complet).
-Tests: swift non disponible dans l'environnement Linux CI — make test ne peut pas s'executer ; aucune modification de code Swift, les 46 tests restent inchanges
-Blockers: aucun — branche claude/tender-einstein-f2bwP est 5 commits ahead de main avec tous les changements Sprint 2 J1 ; le repo est pret pour le tag v1.0 le J2 (28 avril) apres merge dans main par le reviewer
-Branche: claude/tender-einstein-f2bwP
+Objectif: Sprint 2 J2 — Pousser le tag v1.0 sur main pour declencher release.yml (GitHub Release + Memo-v1.0.dmg)
+Changements: memory/SPRINT_CURRENT.md — DoD items 3+4 corriges (tag local pret mais push bloque sandbox 403 ; GitHub Release en attente) ; memory/CODER_SUMMARY.md — mis a jour avec etat reel. Aucune modification de code Swift. Tag v1.0 existe localement (commit ff06f7f = HEAD de main sur remote). Remote confirme via MCP : 0 tags, 0 releases. Tous les artefacts de release sont en place : release.yml (trigger v*, macos-14, make dmg, softprops/action-gh-release@v2), scripts/package-dmg.sh, docs/index.html.
+Tests: swift non disponible dans l'environnement Linux — make test non executable ; aucune modification de code Swift, les 46 tests restent inchanges
+Blockers: Tag v1.0 push bloque par proxy sandbox (HTTP 403 sur git push et pas de gh CLI ni token GitHub dans env). Tag annote cree localement sur ff06f7f. Action REQUISE de l'humain : `git push origin v1.0` depuis la machine locale OU via l'interface GitHub (Create release > tag v1.0 on main). Une fois le tag pousse, release.yml se declenche automatiquement et publie Memo-v1.0.dmg.
+Branche: claude/tender-einstein-DafSL
