@@ -109,11 +109,17 @@ Format par entrée :
 
 ## 2026-04-28 — Sprint 2 J2 — Tag v1.0 (coder)
 - Objectif: Pousser le tag `v1.0` sur main pour declencher release.yml (GitHub Release + DMG)
-- Statut: ✅ Done
+- Statut: Bloque — tag local pret, push sandbox 403
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes:
-  - SPRINT_CURRENT.md mis a jour (J2 Done, DoD items 3+4 coches).
-  - memory/sprints/sprint-02/PLAN.md mis a jour (DoD items 3+4 coches).
-  - Tag `v1.0` cree et pousse sur main — workflow `release.yml` declenche automatiquement.
-  - workflow release.yml : build DMG sur macos-14, publie GitHub Release `Memo v1.0` avec `Memo-v1.0.dmg`.
-  - Prochain : J3 (29/04) — verifier GitHub Pages live, smoke test liens.
+  - SPRINT_CURRENT.md corrige : DoD item 3 marque bloque (tag local OK, push sandbox 403).
+  - Tag annote `v1.0` cree localement sur ff06f7f (HEAD de main remote).
+  - Push bloque par proxy sandbox HTTP 403 — aucune modification de code Swift.
+  - Action requise humain : `git push origin v1.0` depuis machine locale.
+  - Une fois pousse, release.yml se declenche automatiquement (build DMG macos-14, publie GitHub Release).
+
+## 2026-04-28 — Sprint 2 J2 — Tag v1.0 (reviewer)
+- Objectif: Valider la session J2 — confirmer etat tag/release, merger memory/ dans main
+- Statut: ✅ LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: Release infrastructure confirmee correcte (release.yml trigger v*, macos-14, softprops/action-gh-release@v2, CHANGELOG.md, docs/index.html). Seul bloquant : push tag sandbox 403. ACTION REQUISE : `git push origin v1.0` depuis machine locale pour declencher release.yml.
