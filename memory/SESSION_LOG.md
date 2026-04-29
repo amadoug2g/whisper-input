@@ -123,3 +123,23 @@ Format par entrée :
 - Statut: ✅ LGTM
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: Release infrastructure confirmee correcte (release.yml trigger v*, macos-14, softprops/action-gh-release@v2, CHANGELOG.md, docs/index.html). Seul bloquant : push tag sandbox 403. ACTION REQUISE : `git push origin v1.0` depuis machine locale pour declencher release.yml.
+
+## 2026-04-29 — Sprint 2 J3 — GitHub Pages + smoke test + correctifs (coder)
+- Objectif: Verifier GitHub Pages live, smoke test CTA liens, correctifs derniere minute
+- Statut: Done (bloquants humain identifies)
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes:
+  - Tag v1.0 confirme sur remote (pointe vers e775ac1) via MCP GitHub. Releases: 0 (GitHub Release toujours absente).
+  - Diagnostic: release.yml sur remote main (e775ac1) est l'ancienne version sans permissions:contents:write — c'est pourquoi la release n'a pas ete creee.
+  - Fix confirme sur branche locale claude/tender-einstein-edD15 (commit e48b990): release.yml avec permissions:write + workflow_dispatch.
+  - docs/index.html verifie : CTA pointe vers releases/latest/download/Memo-v1.0.dmg (correct), pages.yml present et correct.
+  - ACTIONS REQUISES HUMAIN (dans l'ordre):
+    1. Merger la PR de claude/tender-einstein-edD15 dans main (contient release.yml corrige)
+    2. Depuis GitHub Actions UI > Release > Run workflow : version=1.0 pour creer la GitHub Release avec le DMG
+    3. Verifier GitHub Pages : https://amadoug2g.github.io/whisper-input/ (necessite navigateur)
+
+## 2026-04-29 — Sprint 2 J3 — Review (reviewer)
+- Objectif: Valider la session J3 — smoke test, diagnostic release, fix release.yml
+- Statut: LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: Root cause correctement identifie (permissions:contents:write absent dans release.yml sur main au moment du tag push). Fix correct: permissions:write + workflow_dispatch + tag_name pour dispatch manuel. docs/index.html et pages.yml confirmes corrects. Actions humaines clairement documentees. Branche claude/tender-einstein-edD15 mergee dans main.
