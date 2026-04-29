@@ -21,7 +21,7 @@
 |------|----------|--------|
 | J1 -- 27/04 | Pre-release checklist : .gitignore fix, ROADMAP update, verifier release.yml et pages.yml, preparer changelog | Done |
 | J2 -- 28/04 | Pousser tag `v1.0`, verifier GitHub Release + DMG attache | Partiellement done (tag OK sur remote e775ac1, release absente — permissions fix manquant) |
-| J3 -- 29/04 | Verifier GitHub Pages live, smoke test liens, correctifs derniere minute si besoin | Done — fix release.yml pousse sur branch claude/tender-einstein-edD15 ; ACTION requise humain: (1) merger PR dans main, (2) declencher workflow_dispatch release.yml depuis GitHub Actions UI |
+| J3 -- 29/04 | Verifier GitHub Pages live, smoke test liens, correctifs derniere minute si besoin | Done — fix release.yml merge dans main (permissions:write + workflow_dispatch). ACTION humain: declencher workflow_dispatch release.yml depuis GitHub Actions UI (version=1.0) |
 
 ---
 

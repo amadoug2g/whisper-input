@@ -137,3 +137,9 @@ Format par entrée :
     1. Merger la PR de claude/tender-einstein-edD15 dans main (contient release.yml corrige)
     2. Depuis GitHub Actions UI > Release > Run workflow : version=1.0 pour creer la GitHub Release avec le DMG
     3. Verifier GitHub Pages : https://amadoug2g.github.io/whisper-input/ (necessite navigateur)
+
+## 2026-04-29 — Sprint 2 J3 — Review (reviewer)
+- Objectif: Valider la session J3 — smoke test, diagnostic release, fix release.yml
+- Statut: LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: Root cause correctement identifie (permissions:contents:write absent dans release.yml sur main au moment du tag push). Fix correct: permissions:write + workflow_dispatch + tag_name pour dispatch manuel. docs/index.html et pages.yml confirmes corrects. Actions humaines clairement documentees. Branche claude/tender-einstein-edD15 mergee dans main.
