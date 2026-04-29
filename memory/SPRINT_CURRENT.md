@@ -9,7 +9,7 @@
 - [x] `*.dmg` ajoute au `.gitignore` (fix retro Sprint 1) -- deja present ligne 38
 - [x] ROADMAP.md a jour (items Sprint 1 coches) -- fait 2026-04-27
 - [x] Tag `v1.0` pousse sur `main` -> workflow `release.yml` declenche -- J2 OK (tag annote sur e775ac1, confirme via MCP)
-- [~] GitHub Release `v1.0` visible publiquement avec `Memo-v1.0.dmg` attache -- J3: release.yml a tourne mais release absente (permissions: contents:write manquant, corrige J3). ACTION: humain doit declencher release.yml via workflow_dispatch depuis GitHub Actions UI
+- [~] GitHub Release `v1.0` visible publiquement avec `Memo-v1.0.dmg` attache -- J3: fix release.yml (permissions:write + workflow_dispatch) sur branch, PR a merger dans main puis workflow_dispatch a declencher manuellement depuis GitHub Actions UI
 - [~] GitHub Pages sert `docs/index.html` -- J3: pages.yml present et correct, verification URL necessite navigateur (humain)
 - [~] Lien de telechargement sur la landing page pointe vers une release existante -- J3: CTA pointe vers releases/latest/download/Memo-v1.0.dmg, fonctionnera des que la release existe
 
@@ -21,7 +21,7 @@
 |------|----------|--------|
 | J1 -- 27/04 | Pre-release checklist : .gitignore fix, ROADMAP update, verifier release.yml et pages.yml, preparer changelog | Done |
 | J2 -- 28/04 | Pousser tag `v1.0`, verifier GitHub Release + DMG attache | Partiellement done (tag OK sur remote e775ac1, release absente — permissions fix manquant) |
-| J3 -- 29/04 | Verifier GitHub Pages live, smoke test liens, correctifs derniere minute si besoin | Done — fix release.yml (permissions: write + workflow_dispatch), ACTION requise humain: declencher workflow_dispatch |
+| J3 -- 29/04 | Verifier GitHub Pages live, smoke test liens, correctifs derniere minute si besoin | Done — fix release.yml pousse sur branch claude/tender-einstein-edD15 ; ACTION requise humain: (1) merger PR dans main, (2) declencher workflow_dispatch release.yml depuis GitHub Actions UI |
 
 ---
 
