@@ -9,9 +9,9 @@
 - [x] `*.dmg` ajoute au `.gitignore` (fix retro Sprint 1) -- deja present ligne 38
 - [x] ROADMAP.md a jour (items Sprint 1 coches) -- fait 2026-04-27
 - [x] Tag `v1.0` pousse sur `main` -> workflow `release.yml` declenche -- J2 OK (tag annote sur e775ac1, confirme via MCP)
-- [~] GitHub Release `v1.0` visible publiquement avec `Memo-v1.0.dmg` attache -- J3: fix release.yml (permissions:write + workflow_dispatch) sur branch, PR a merger dans main puis workflow_dispatch a declencher manuellement depuis GitHub Actions UI
-- [~] GitHub Pages sert `docs/index.html` -- J3: pages.yml present et correct, verification URL necessite navigateur (humain)
-- [~] Lien de telechargement sur la landing page pointe vers une release existante -- J3: CTA pointe vers releases/latest/download/Memo-v1.0.dmg, fonctionnera des que la release existe
+- [x] GitHub Release `v1.0` visible publiquement avec `Memo-v1.0.dmg` attache -- CONFIRME 2026-04-30 (release id 315149842, DMG 1.85 MB, publie 2026-04-29T11:39:02Z, 1 download)
+- [~] GitHub Pages sert `docs/index.html` -- pages.yml present et correct, verification URL necessite navigateur (humain)
+- [x] Lien de telechargement sur la landing page pointe vers une release existante -- CTA pointe vers releases/latest/download/Memo-v1.0.dmg, release v1.0 existe
 
 ---
 
@@ -22,6 +22,7 @@
 | J1 -- 27/04 | Pre-release checklist : .gitignore fix, ROADMAP update, verifier release.yml et pages.yml, preparer changelog | Done |
 | J2 -- 28/04 | Pousser tag `v1.0`, verifier GitHub Release + DMG attache | Partiellement done (tag OK sur remote e775ac1, release absente — permissions fix manquant) |
 | J3 -- 29/04 | Verifier GitHub Pages live, smoke test liens, correctifs derniere minute si besoin | Done — fix release.yml merge dans main (permissions:write + workflow_dispatch). ACTION humain: declencher workflow_dispatch release.yml depuis GitHub Actions UI (version=1.0) |
+| J4 -- 30/04 | DEADLINE — Confirmer GitHub Release v1.0 live + DMG attache, cloturer Sprint 2 | Done — GitHub Release v1.0 CONFIRME (id 315149842, Memo-v1.0.dmg 1.85 MB, publie 2026-04-29, 1 download). Sprint 2 clos. |
 
 ---
 
