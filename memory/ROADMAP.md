@@ -22,7 +22,7 @@
 
 ### Semaine 3 — 24-28 avril 2026 : Polish + Publication
 
-- [ ] **GitHub Release v1.0** — tag `v1.0`, changelog, DMG attache (Sprint 2, 27-30 avril)
+- [x] **GitHub Release v1.0** — tag `v1.0`, changelog, DMG attache -- Sprint 2, 2026-04-29 (release id 315149842, Memo-v1.0.dmg 1.85 MB)
 - [x] **README polish** — badges CI/release/macOS/license, install instructions -- Sprint 1 J4, 2026-04-21
 - [ ] ~~**Localisation francaise**~~ — reporte hors v1.0 (deadline trop proche)
 

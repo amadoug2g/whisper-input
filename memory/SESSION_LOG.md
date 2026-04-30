@@ -143,3 +143,16 @@ Format par entrée :
 - Statut: LGTM
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: Root cause correctement identifie (permissions:contents:write absent dans release.yml sur main au moment du tag push). Fix correct: permissions:write + workflow_dispatch + tag_name pour dispatch manuel. docs/index.html et pages.yml confirmes corrects. Actions humaines clairement documentees. Branche claude/tender-einstein-edD15 mergee dans main.
+
+## 2026-04-30 — Sprint 2 J4 (DEADLINE) — Confirmation release v1.0 (coder)
+- Objectif: Confirmer GitHub Release v1.0 live + DMG attache, cloturer Sprint 2
+- Statut: Done
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes:
+  - GitHub Release v1.0 CONFIRME via MCP GitHub : id 315149842, tag v1.0, publie 2026-04-29T11:39:02Z, cree par github-actions[bot].
+  - DMG confirme : Memo-v1.0.dmg, 1.85 MB (1853348 octets), state=uploaded, sha256:3e83d3e3b13fe0fba5e7d96d9e18f617bc13e4e9df3406ba307be76d47eda9f6, 1 telechargement.
+  - Release URL : https://github.com/amadoug2g/whisper-input/releases/tag/v1.0
+  - DMG URL : https://github.com/amadoug2g/whisper-input/releases/download/v1.0/Memo-v1.0.dmg
+  - SPRINT_CURRENT.md : DoD items GitHub Release et CTA coches.
+  - Sprint 2 clos. Memo v1.0 est publiquement disponible avant la deadline du 30 avril 2026.
+  - Reste humain : verifier GitHub Pages https://amadoug2g.github.io/whisper-input/ dans un navigateur.
