@@ -156,3 +156,9 @@ Format par entrée :
   - SPRINT_CURRENT.md : DoD items GitHub Release et CTA coches.
   - Sprint 2 clos. Memo v1.0 est publiquement disponible avant la deadline du 30 avril 2026.
   - Reste humain : verifier GitHub Pages https://amadoug2g.github.io/whisper-input/ dans un navigateur.
+
+## 2026-04-30 — Sprint 2 J4 (DEADLINE) — Review (reviewer)
+- Objectif: Valider la confirmation GitHub Release v1.0 et cloturer Sprint 2
+- Statut: LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: GitHub Release v1.0 CONFIRME (id 315149842, Memo-v1.0.dmg 1.85 MB, publie 2026-04-29T11:39:02Z, 1 download). Seuls memory/ modifies (CODER_SUMMARY, ROADMAP, SESSION_LOG, SPRINT_CURRENT). Sprint 2 clos avant la deadline du 30 avril 2026. Reste humain : verifier GitHub Pages dans un navigateur.
