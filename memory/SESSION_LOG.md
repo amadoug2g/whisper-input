@@ -168,3 +168,8 @@ Format par entrée :
 - Statut: Done
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: Sprint 2 entierement clos. Branche claude/tender-einstein-Tjlvc a jour avec commit b8d0570 (SPRINT_REVIEW, RETRO, PLAN DoD). Aucune action restante pour l'agent — seule verification humaine restante : confirmer GitHub Pages dans un navigateur (https://amadoug2g.github.io/whisper-input/). Memo v1.0 est public (GitHub Release id 315149842, Memo-v1.0.dmg 1.85 MB).
+
+## 2026-05-01 — Post-Sprint 2 — Verification (reviewer)
+- Objectif: Valider la session post-deadline du coder (documentation et SESSION_LOG)
+- Statut: LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
