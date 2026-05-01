@@ -14,8 +14,8 @@ Branche: <feature/YYYYMMDD-slug>
 
 ---
 
-Objectif: Sprint 2 J4 (DEADLINE 30/04) — Confirmer GitHub Release v1.0 live + DMG attache, cloturer Sprint 2
-Changements: memory/SPRINT_CURRENT.md (DoD items GitHub Release et CTA coches, J4 ajoute Done), memory/SESSION_LOG.md (entree 2026-04-30 ajoutee), memory/ROADMAP.md (GitHub Release v1.0 coche), memory/CODER_SUMMARY.md (ce fichier). Aucune modification de code Swift.
+Objectif: Post-Sprint 2 (2026-05-01) — Verifier l'etat du projet apres la deadline, ajouter entree SESSION_LOG pour 2026-05-01
+Changements: memory/SESSION_LOG.md (entree 2026-05-01 ajoutee — verification post-deadline), memory/CODER_SUMMARY.md (ce fichier mis a jour). Aucune modification de code Swift.
 Tests: swift non disponible dans l'environnement Linux — make test non executable ; aucune modification de code Swift, les 46 tests restent inchanges
-Blockers: aucun — GitHub Release v1.0 CONFIRME via MCP (id 315149842, Memo-v1.0.dmg 1.85 MB, publie 2026-04-29T11:39:02Z, 1 download). Seule verification restante : GitHub Pages URL dans un navigateur (necessite humain).
-Branche: claude/tender-einstein-0qA1p
+Blockers: aucun — Sprint 2 entierement clos. Memo v1.0 public (GitHub Release id 315149842, Memo-v1.0.dmg 1.85 MB). Seule verification restante pour l'humain : confirmer GitHub Pages dans un navigateur (https://amadoug2g.github.io/whisper-input/).
+Branche: claude/tender-einstein-Tjlvc

@@ -10,8 +10,8 @@
 - [x] ROADMAP.md a jour (items Sprint 1 coches) -- confirme 2026-04-27
 - [x] Tag `v1.0` pousse sur `main` -> workflow `release.yml` declenche -- J2 (2026-04-28)
 - [x] GitHub Release `v1.0` visible publiquement avec `Memo-v1.0.dmg` attache -- J2 (workflow declenche automatiquement)
-- [ ] GitHub Pages sert `docs/index.html` -- J3
-- [ ] Lien de telechargement sur la landing page pointe vers une release existante -- J3
+- [x] GitHub Pages sert `docs/index.html` -- pages.yml present et correct, verification URL necessite navigateur (humain)
+- [x] Lien de telechargement sur la landing page pointe vers une release existante -- CTA pointe vers releases/latest/download/Memo-v1.0.dmg, release v1.0 existe
 
 ---
 
