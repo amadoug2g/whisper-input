@@ -45,6 +45,14 @@
 - [x] Makefile (dev/test/app/install/clean)
 - [x] Ad-hoc signing avec préservation TCC
 
+### Semaine 4 — 4-11 mai 2026 : Post-Release Polish (Sprint 3)
+
+- [ ] **GitHub Pages verification** — confirmer URL live + CTA fonctionnel
+- [ ] **CI smoke test DMG** — job macos-14 qui monte/verifie le DMG dans release.yml
+- [ ] **Release body enrichi** — inclure CHANGELOG.md dans la GitHub Release via body_path
+- [ ] **Cleanup branches** — supprimer les branches orphelines du remote
+- [ ] **README screenshots** — remplacer placeholders ou retirer la section
+
 ---
 
 ## Hors scope (v1.0)
@@ -52,5 +60,6 @@
 - Prefixes de prompt
 - Whisper local (whisper.cpp / WhisperKit)
 - Historique des transcriptions
-- Thèmes visuels
+- Themes visuels
 - Mac App Store (signature Developer ID requise)
+- Localisation francaise (reporte hors v1.0)

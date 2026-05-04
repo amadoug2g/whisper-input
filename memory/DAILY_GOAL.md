@@ -1,33 +1,31 @@
-# Objectif du jour -- 2026-04-28 (Sprint 2, J2)
+# Objectif du jour -- 2026-05-04 (Sprint 3, J1)
 
 ## Contexte sprint
-Ship v1.0 Final Release : pousser tag v1.0, verifier GitHub Release + GitHub Pages live avant le 30 avril 2026.
+Consolider la release v1.0 : verifier GitHub Pages, ameliorer la CI, enrichir la release, nettoyer les branches orphelines.
 
 ## Tache
-Pousser le tag `v1.0` sur `main` pour declencher le workflow `release.yml`.
+Verifier que GitHub Pages sert correctement la landing page de Memo, et nettoyer les branches orphelines sur le remote.
 
-Le workflow `release.yml` (deja valide J1) :
-- Se declenche sur tag `v*`
-- Tourne sur `macos-14`
-- `make dmg VERSION=1.0` → genere `Memo-v1.0.dmg`
-- Publie la GitHub Release `Memo v1.0` avec le DMG attache via `softprops/action-gh-release@v2`
+GitHub Pages est le dernier deliverable non verifie de la v1.0. La page devrait etre accessible a https://amadoug2g.github.io/whisper-input/. Le workflow `pages.yml` est configure pour deployer `docs/` sur push to main (filtre path `docs/**`). Si Pages n'est pas actif, documenter les etapes d'activation pour l'humain.
 
-## Actions J2 :
-1. Merger les changements memory/ dans `main` (branche claude/tender-einstein-DafSL)
-2. Pousser le tag `v1.0` sur `main`
-3. Verifier que `release.yml` se declenche (dans les logs GitHub Actions)
-4. Mettre a jour SPRINT_CURRENT.md, SESSION_LOG.md
+Branches orphelines a supprimer :
+- claude/affectionate-cerf-gMClj
+- claude/tender-einstein-QyVHC
+- claude/affectionate-cerf-DWEYt
+- claude/affectionate-cerf-PScAP
 
 ## Criteres de succes
-- [x] SPRINT_CURRENT.md mis a jour (J2 Done)
-- [x] Tag `v1.0` cree et pousse sur main
-- [x] workflow `release.yml` declenche
-- [ ] GitHub Release `v1.0` visible avec `Memo-v1.0.dmg` attache (verification humain sur macOS/GitHub)
+- [ ] GitHub Pages status verifie via API GitHub (deployment existe ou non)
+- [ ] Si Pages inactif : instructions d'activation documentees pour l'humain
+- [ ] Si Pages actif : lien CTA vers DMG verifie (pointe vers release existante)
+- [ ] Branches orphelines supprimees du remote
+- [ ] SESSION_LOG.md mis a jour avec l'entree du jour
 
-## Prochain (J3 — 29/04)
-- Verifier GitHub Pages live (`https://amadoug2g.github.io/whisper-input/`)
-- Smoke test liens CTA vers releases/latest/download/Memo-v1.0.dmg
-- Correctifs derniere minute si besoin
+## Fichiers concernes
+- `docs/index.html` -- landing page source
+- `.github/workflows/pages.yml` -- workflow de deploiement Pages
+- `memory/SESSION_LOG.md` -- log de session
+- `memory/SPRINT_CURRENT.md` -- mise a jour statut J1
 
 ## Priorite
-**Tres haute** -- Deadline dans 2 jours. Tag v1.0 = action cle de la release.
+Haute -- GitHub Pages est le dernier deliverable v1.0 non confirme. Les branches orphelines sont du nettoyage rapide a faire en meme temps.
