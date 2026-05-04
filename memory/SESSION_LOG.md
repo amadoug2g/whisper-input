@@ -174,6 +174,27 @@ Format par entrée :
 - Statut: LGTM
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 
+## 2026-05-04 — Sprint 3 J1 — GitHub Pages verification + branch cleanup (coder)
+- Objectif: Verifier GitHub Pages, verifier CTA DMG, supprimer 5 branches orphelines
+- Statut: Partiellement bloque (humain)
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes:
+  - pages.yml confirme correct sur main (uses actions/configure-pages@v5 + actions/deploy-pages@v4, deploie docs/, permissions minimales OK).
+  - Dernier commit touchant docs/ : 313ac9e (2026-04-30, favicon update) — pages.yml aurait du etre declenche si Pages est active via "GitHub Actions" source.
+  - CTA docs/index.html verifie : pointe vers releases/latest/download/Memo-v1.0.dmg — correct (release v1.0 confirme avec DMG 1.85 MB, 2 downloads).
+  - 4 branches orphelines trouvees sur remote : claude/affectionate-cerf-gMClj, claude/tender-einstein-QyVHC, claude/affectionate-cerf-DWEYt, claude/affectionate-cerf-PScAP. (5eme claude/affectionate-cerf-26dE4 n'existe plus.)
+  - BLOCKERS HUMAIN :
+    1. Verifier GitHub Pages actif : Settings > Pages > Source = "GitHub Actions". Si inactif, activer et lancer workflow_dispatch sur pages.yml.
+    2. Confirmer URL live : https://amadoug2g.github.io/whisper-input/ dans un navigateur.
+    3. Supprimer les 4 branches orphelines (push --delete bloque par proxy 403 dans cet environnement) :
+       git push origin --delete claude/affectionate-cerf-gMClj claude/tender-einstein-QyVHC claude/affectionate-cerf-DWEYt claude/affectionate-cerf-PScAP
+
+## 2026-05-04 — Sprint 3 J1 — Review (reviewer)
+- Objectif: Valider la verification GitHub Pages, CTA DMG, et nettoyage branches orphelines
+- Statut: LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: pages.yml confirme correct (configure-pages@v5, deploy-pages@v4, permissions minimales). docs/index.html CTA pointe vers releases/latest/download/Memo-v1.0.dmg (DMG v1.0 confirme 1.85 MB, 2 downloads). 4 branches orphelines non supprimees — bloquees par proxy 403 dans sandbox, aucun outil MCP de suppression de branche disponible. Blockers correctement documentes avec instructions humaines precises. Seuls fichiers memory/ modifies. SESSION_LOG et SPRINT_CURRENT mis a jour. LGTM — blockers sont des contraintes environnementales, pas des echecs d'implementation.
+
 ## 2026-05-04 — Weekly Strategic Review (manager)
 - Objectif: Revue strategique hebdomadaire — cloture Sprint 2, lancement Sprint 3
 - Statut: Review completee

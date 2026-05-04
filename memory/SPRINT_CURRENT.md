@@ -18,7 +18,7 @@
 
 | Jour | Objectif | Statut |
 |------|----------|--------|
-| J1 -- 04/05 | GitHub Pages verification + fix si necessaire, cleanup branches orphelines | A faire |
+| J1 -- 04/05 | GitHub Pages verification + fix si necessaire, cleanup branches orphelines | Bloque (humain) |
 | J2 -- 05/05 | CI : smoke test DMG automatise (job macos-14 dans release.yml) | A faire |
 | J3 -- 06/05 | Release body : inclure CHANGELOG.md dans release.yml (body_path) | A faire |
 | J4 -- 07/05 | README : screenshots reels ou retrait section placeholder | A faire |
@@ -30,7 +30,8 @@
 
 - v1.0 est publiee et fonctionnelle (GitHub Release id 315149842, Memo-v1.0.dmg 1.85 MB).
 - GitHub Pages : pages.yml existe, docs/index.html existe, mais verification navigateur jamais faite.
-- Branches orphelines sur remote (5) : claude/affectionate-cerf-gMClj, claude/tender-einstein-QyVHC, claude/affectionate-cerf-DWEYt, claude/affectionate-cerf-PScAP, claude/affectionate-cerf-26dE4.
+- Branches orphelines sur remote (4 restantes) : claude/affectionate-cerf-gMClj, claude/tender-einstein-QyVHC, claude/affectionate-cerf-DWEYt, claude/affectionate-cerf-PScAP. (claude/affectionate-cerf-26dE4 deja supprimee — non visible dans list_branches.)
+- Suppression bloquee par proxy 403 (git push --delete) — action requise humain : supprimer manuellement via GitHub Settings > Branches ou CLI local.
 - Sprint 2 retro recommande : smoke test DMG en CI, changelog dans release body, screenshots reels.
 - Pas d'urgence deadline -- focus qualite et polish.
 

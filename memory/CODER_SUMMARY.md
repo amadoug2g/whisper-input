@@ -14,8 +14,8 @@ Branche: <feature/YYYYMMDD-slug>
 
 ---
 
-Objectif: Post-Sprint 2 (2026-05-01) — Verifier l'etat du projet apres la deadline, ajouter entree SESSION_LOG pour 2026-05-01
-Changements: memory/SESSION_LOG.md (entree 2026-05-01 ajoutee — verification post-deadline), memory/CODER_SUMMARY.md (ce fichier mis a jour). Aucune modification de code Swift.
+Objectif: Sprint 3 J1 (2026-05-04) — Verifier GitHub Pages, verifier CTA DMG, supprimer 4 branches orphelines sur le remote
+Changements: memory/SESSION_LOG.md (entree 2026-05-04 J1 ajoutee), memory/SPRINT_CURRENT.md (J1 marque Bloque humain, branches orphelines mises a jour), memory/CODER_SUMMARY.md (ce fichier). Aucune modification de code Swift.
 Tests: swift non disponible dans l'environnement Linux — make test non executable ; aucune modification de code Swift, les 46 tests restent inchanges
-Blockers: aucun — Sprint 2 entierement clos. Memo v1.0 public (GitHub Release id 315149842, Memo-v1.0.dmg 1.85 MB). Seule verification restante pour l'humain : confirmer GitHub Pages dans un navigateur (https://amadoug2g.github.io/whisper-input/).
-Branche: claude/tender-einstein-Tjlvc
+Blockers: (1) Suppression branches orphelines bloquee — git push --delete retourne HTTP 403 via proxy sandbox, aucun outil MCP de suppression de branche disponible. 4 branches orphelines restantes sur remote : claude/affectionate-cerf-gMClj, claude/tender-einstein-QyVHC, claude/affectionate-cerf-DWEYt, claude/affectionate-cerf-PScAP. Action humaine requise : git push origin --delete claude/affectionate-cerf-gMClj claude/tender-einstein-QyVHC claude/affectionate-cerf-DWEYt claude/affectionate-cerf-PScAP (ou via GitHub UI Settings > Branches). (2) Verification GitHub Pages URL impossible sans navigateur — action humaine : verifier https://amadoug2g.github.io/whisper-input/ et si inactif activer Settings > Pages > Source = "GitHub Actions" puis workflow_dispatch sur pages.yml. Etat verifie via API : pages.yml correct sur main (configure-pages@v5 + deploy-pages@v4), CTA docs/index.html pointe vers releases/latest/download/Memo-v1.0.dmg (correct, DMG v1.0 confirme 1.85 MB, 2 downloads).
+Branche: claude/tender-einstein-xVHhm
