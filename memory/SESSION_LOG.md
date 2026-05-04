@@ -173,3 +173,17 @@ Format par entrée :
 - Objectif: Valider la session post-deadline du coder (documentation et SESSION_LOG)
 - Statut: LGTM
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+
+## 2026-05-04 — Weekly Strategic Review (manager)
+- Objectif: Revue strategique hebdomadaire — cloture Sprint 2, lancement Sprint 3
+- Statut: Review completee
+- Tests: N/A
+- Notes:
+  - **Deadline 30 avril 2026 : RESPECTEE.** Memo v1.0 publie le 29 avril (GitHub Release id 315149842, Memo-v1.0.dmg 1.85 MB).
+  - Sprint 2 : entierement clos, archive dans memory/sprints/sprint-02/ (SPRINT_REVIEW, RETRO, PLAN). DoD 6/6.
+  - Local main mis a jour (etait 13 commits derriere remote, fast-forward vers 00cca63).
+  - **Sprint 3 demarre : "Post-Release Polish"** (4-11 mai, 1 semaine).
+  - Backlog Sprint 3 : J1=GitHub Pages verification + branch cleanup, J2=smoke test DMG CI, J3=release body enrichi, J4=README screenshots, J5=review+retro.
+  - DAILY_GOAL : verifier GitHub Pages + nettoyer branches orphelines (4 branches a supprimer).
+  - **Aucune urgence deadline** — focus qualite, CI hardening, polish.
+  - 4 branches orphelines identifiees sur remote a nettoyer.
