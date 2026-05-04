@@ -186,4 +186,6 @@ Format par entrée :
   - Backlog Sprint 3 : J1=GitHub Pages verification + branch cleanup, J2=smoke test DMG CI, J3=release body enrichi, J4=README screenshots, J5=review+retro.
   - DAILY_GOAL : verifier GitHub Pages + nettoyer branches orphelines (4 branches a supprimer).
   - **Aucune urgence deadline** — focus qualite, CI hardening, polish.
-  - 4 branches orphelines identifiees sur remote a nettoyer.
+  - 5 branches orphelines identifiees sur remote a nettoyer (4 anciennes + claude/affectionate-cerf-26dE4 post-merge).
+  - PR #19 creee et mergee (squash) dans main : Sprint 3 setup (commit 6865913).
+  - DAILY_GOAL mis a jour avec 5eme branche a nettoyer.

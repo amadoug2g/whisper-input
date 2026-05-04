@@ -30,7 +30,7 @@
 
 - v1.0 est publiee et fonctionnelle (GitHub Release id 315149842, Memo-v1.0.dmg 1.85 MB).
 - GitHub Pages : pages.yml existe, docs/index.html existe, mais verification navigateur jamais faite.
-- Branches orphelines sur remote : claude/affectionate-cerf-gMClj, claude/tender-einstein-QyVHC, claude/affectionate-cerf-DWEYt, claude/affectionate-cerf-PScAP.
+- Branches orphelines sur remote (5) : claude/affectionate-cerf-gMClj, claude/tender-einstein-QyVHC, claude/affectionate-cerf-DWEYt, claude/affectionate-cerf-PScAP, claude/affectionate-cerf-26dE4.
 - Sprint 2 retro recommande : smoke test DMG en CI, changelog dans release body, screenshots reels.
 - Pas d'urgence deadline -- focus qualite et polish.
 

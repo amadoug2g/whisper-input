@@ -8,11 +8,12 @@ Verifier que GitHub Pages sert correctement la landing page de Memo, et nettoyer
 
 GitHub Pages est le dernier deliverable non verifie de la v1.0. La page devrait etre accessible a https://amadoug2g.github.io/whisper-input/. Le workflow `pages.yml` est configure pour deployer `docs/` sur push to main (filtre path `docs/**`). Si Pages n'est pas actif, documenter les etapes d'activation pour l'humain.
 
-Branches orphelines a supprimer :
+Branches orphelines a supprimer (5 au total, toutes mergees ou obsoletes) :
 - claude/affectionate-cerf-gMClj
 - claude/tender-einstein-QyVHC
 - claude/affectionate-cerf-DWEYt
 - claude/affectionate-cerf-PScAP
+- claude/affectionate-cerf-26dE4 (PR #19 mergee le 04/05)
 
 ## Criteres de succes
 - [ ] GitHub Pages status verifie via API GitHub (deployment existe ou non)
