@@ -189,6 +189,12 @@ Format par entrée :
     3. Supprimer les 4 branches orphelines (push --delete bloque par proxy 403 dans cet environnement) :
        git push origin --delete claude/affectionate-cerf-gMClj claude/tender-einstein-QyVHC claude/affectionate-cerf-DWEYt claude/affectionate-cerf-PScAP
 
+## 2026-05-04 — Sprint 3 J1 — Review (reviewer)
+- Objectif: Valider la verification GitHub Pages, CTA DMG, et nettoyage branches orphelines
+- Statut: LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: pages.yml confirme correct (configure-pages@v5, deploy-pages@v4, permissions minimales). docs/index.html CTA pointe vers releases/latest/download/Memo-v1.0.dmg (DMG v1.0 confirme 1.85 MB, 2 downloads). 4 branches orphelines non supprimees — bloquees par proxy 403 dans sandbox, aucun outil MCP de suppression de branche disponible. Blockers correctement documentes avec instructions humaines precises. Seuls fichiers memory/ modifies. SESSION_LOG et SPRINT_CURRENT mis a jour. LGTM — blockers sont des contraintes environnementales, pas des echecs d'implementation.
+
 ## 2026-05-04 — Weekly Strategic Review (manager)
 - Objectif: Revue strategique hebdomadaire — cloture Sprint 2, lancement Sprint 3
 - Statut: Review completee
