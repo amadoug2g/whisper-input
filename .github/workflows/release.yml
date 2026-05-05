@@ -63,3 +63,57 @@ jobs:
           files: Memo-v${{ steps.version.outputs.version }}.dmg
           draft: false
           prerelease: false
+
+  smoke-test:
+    name: Smoke test DMG
+    runs-on: macos-14
+    needs: build-and-release
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download DMG from release
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          gh release download "v${VERSION}" \
+            --pattern "Memo-v${VERSION}.dmg" \
+            --repo "${{ github.repository }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Mount DMG and verify Memo.app
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          DMG="Memo-v${VERSION}.dmg"
+
+          echo "→ Attaching $DMG"
+          MOUNT_OUTPUT=$(hdiutil attach "$DMG" -nobrowse -noautoopen)
+          MOUNT_POINT=$(echo "$MOUNT_OUTPUT" | grep -E '/Volumes/' | tail -1 | awk '{print $NF}')
+
+          echo "→ Mounted at: $MOUNT_POINT"
+          ls -la "$MOUNT_POINT"
+
+          echo "→ Verifying Memo.app"
+          if [ ! -d "$MOUNT_POINT/Memo.app" ]; then
+            echo "ERROR: Memo.app not found in DMG" >&2
+            hdiutil detach "$MOUNT_POINT" -quiet || true
+            exit 1
+          fi
+
+          echo "→ Checking code signature"
+          codesign --verify --verbose "$MOUNT_POINT/Memo.app"
+
+          echo "→ Detaching DMG"
+          hdiutil detach "$MOUNT_POINT" -quiet
+
+          echo "Smoke test passed: Memo.app found and signature verified"

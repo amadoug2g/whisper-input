@@ -195,6 +195,15 @@ Format par entrée :
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: pages.yml confirme correct (configure-pages@v5, deploy-pages@v4, permissions minimales). docs/index.html CTA pointe vers releases/latest/download/Memo-v1.0.dmg (DMG v1.0 confirme 1.85 MB, 2 downloads). 4 branches orphelines non supprimees — bloquees par proxy 403 dans sandbox, aucun outil MCP de suppression de branche disponible. Blockers correctement documentes avec instructions humaines precises. Seuls fichiers memory/ modifies. SESSION_LOG et SPRINT_CURRENT mis a jour. LGTM — blockers sont des contraintes environnementales, pas des echecs d'implementation.
 
+## 2026-05-05 — Sprint 3 J2 — CI smoke test DMG (coder)
+- Objectif: Ajouter un job `smoke-test` dans release.yml : monte le DMG via hdiutil, verifie Memo.app, verifie la signature ad-hoc, demonte
+- Statut: Done
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes:
+  - Job `smoke-test` ajoute dans `.github/workflows/release.yml`, apres `build-and-release` (needs: build-and-release).
+  - Etapes : (1) checkout, (2) extract version (identique au job build), (3) `gh release download` avec GH_TOKEN pour telecharger le DMG publie, (4) `hdiutil attach -nobrowse -noautoopen` + parse mount point, (5) verifie presence de `Memo.app`, (6) `codesign --verify --verbose`, (7) `hdiutil detach`. Nettoyage garanti (detach dans le cas d'echec de l'assertion).
+  - SPRINT_CURRENT.md : J2 marque Done, DoD item CI coche.
+
 ## 2026-05-04 — Weekly Strategic Review (manager)
 - Objectif: Revue strategique hebdomadaire — cloture Sprint 2, lancement Sprint 3
 - Statut: Review completee
