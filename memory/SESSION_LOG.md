@@ -207,7 +207,7 @@ Format par entrée :
 ## 2026-05-05 — Sprint 3 J2 — CI smoke test DMG (reviewer)
 - Objectif: Valider le job smoke-test DMG dans release.yml
 - Statut: LGTM
-- PR: en cours de creation
+- PR: #21 (https://github.com/amadoug2g/whisper-input/pull/21) — merged
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: Job smoke-test correct — needs:build-and-release, version extraction identique au job build, gh release download avec GH_TOKEN, hdiutil attach -nobrowse -noautoopen, verification Memo.app, codesign --verify --verbose, detach. Suggestion non-bloquante : ajouter un trap pour garantir hdiutil detach meme si codesign echoue (le runner est ephemere donc sans consequence pratique, mais serait plus robuste). Sprint 3 J2 Done, DoD item CI coche.
 
