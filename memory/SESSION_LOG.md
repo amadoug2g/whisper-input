@@ -211,6 +211,22 @@ Format par entrée :
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: Job smoke-test correct — needs:build-and-release, version extraction identique au job build, gh release download avec GH_TOKEN, hdiutil attach -nobrowse -noautoopen, verification Memo.app, codesign --verify --verbose, detach. Suggestion non-bloquante : ajouter un trap pour garantir hdiutil detach meme si codesign echoue (le runner est ephemere donc sans consequence pratique, mais serait plus robuste). Sprint 3 J2 Done, DoD item CI coche.
 
+## 2026-05-11 — Sprint 3 J3+J4 — Release body CHANGELOG + README screenshots (coder)
+- Objectif: Enrichir le release body avec CHANGELOG.md (body_path), retirer section Screenshots placeholder du README
+- Statut: Done
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes:
+  - release.yml : remplacement du body inline par `body_path: CHANGELOG.md` dans le job build-and-release. La prochaine release utilisera automatiquement le contenu de CHANGELOG.md comme description.
+  - README.md : section "Screenshots" placeholder retiree (etait marquee "a venir depuis Sprint 1 J5").
+  - SPRINT_CURRENT.md : J3 et J4 marques Done, DoD items correspondants coches.
+  - Branche : claude/tender-einstein-bJrkk.
+
+## 2026-05-11 — Sprint 3 J3+J4 — Review (reviewer)
+- Objectif: Valider release body CHANGELOG.md (body_path) et retrait section Screenshots README
+- Statut: LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: body_path: CHANGELOG.md correct (fichier present a la racine, compatible softprops/action-gh-release@v2). README section Screenshots retiree proprement. SPRINT_CURRENT J3+J4 Done, DoD items coches. Suggestion non-bloquante : enrichir CHANGELOG.md avant chaque prochaine release pour que le body_path reste pertinent.
+
 ## 2026-05-04 — Weekly Strategic Review (manager)
 - Objectif: Revue strategique hebdomadaire — cloture Sprint 2, lancement Sprint 3
 - Statut: Review completee

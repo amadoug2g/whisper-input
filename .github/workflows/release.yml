@@ -48,18 +48,7 @@ jobs:
         with:
           tag_name: "v${{ steps.version.outputs.version }}"
           name: "Memo v${{ steps.version.outputs.version }}"
-          body: |
-            ## Memo v${{ steps.version.outputs.version }}
-
-            ### Install
-            1. Download `Memo-v${{ steps.version.outputs.version }}.dmg`
-            2. Open the DMG, drag **Memo** to Applications
-            3. Launch Memo from Spotlight or Applications
-            4. Add your OpenAI API key in Settings
-
-            ### Requirements
-            - macOS 13 Ventura or later
-            - OpenAI API key (for Whisper transcription)
+          body_path: CHANGELOG.md
           files: Memo-v${{ steps.version.outputs.version }}.dmg
           draft: false
           prerelease: false

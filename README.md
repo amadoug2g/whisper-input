@@ -40,10 +40,6 @@ Memo enregistre votre voix via un raccourci global, envoie l'audio a l'API OpenA
 [⌘Entree → coller dans le champ actif]
 ```
 
-## Screenshots
-
-> Screenshots a venir (Sprint 1, J5).
-
 ## Fonctionnalites
 
 - **Raccourci global** (⌥ Espace par defaut, configurable dans les preferences)
