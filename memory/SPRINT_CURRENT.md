@@ -22,7 +22,7 @@
 | J2 -- 05/05 | CI : smoke test DMG automatise (job macos-14 dans release.yml) | Done |
 | J3 -- 06/05 | Release body : inclure CHANGELOG.md dans release.yml (body_path) | Done |
 | J4 -- 07/05 | README : screenshots reels ou retrait section placeholder | Done |
-| J5 -- 08/05 | Sprint review + retro | A faire |
+| J5 -- 08/05 | Sprint review + retro | Done |
 
 ---
 
