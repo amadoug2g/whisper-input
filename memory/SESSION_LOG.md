@@ -227,6 +227,22 @@ Format par entrée :
 - Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
 - Notes: body_path: CHANGELOG.md correct (fichier present a la racine, compatible softprops/action-gh-release@v2). README section Screenshots retiree proprement. SPRINT_CURRENT J3+J4 Done, DoD items coches. Suggestion non-bloquante : enrichir CHANGELOG.md avant chaque prochaine release pour que le body_path reste pertinent.
 
+## 2026-05-12 — Sprint 3 J5 — Sprint review + retro (coder)
+- Objectif: Ecrire la sprint review et la retrospective Sprint 3, marquer J5 Done
+- Statut: Done
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes:
+  - SPRINT_REVIEW.md cree : bilan DoD (3/5 livres, 2 bloquants humain), backlog J1-J5, livrables techniques (smoke-test CI, body_path CHANGELOG, README), bloquants documentes avec instructions precises, metriques sprint, score 3/5 DoD.
+  - RETRO.md cree : format Keep/Improve/Add. Keep: smoke test CI, MCP GitHub sans navigateur, groupage J3+J4, LGTM 100%. Improve: anticiper bloquants sandbox, DAILY_GOAL dates, sync PLAN.md/SPRINT_CURRENT.md. Add: test connectivite git en debut de session. Score global 23/25.
+  - PLAN.md et SPRINT_CURRENT.md : J5 marque Done.
+  - Sprint 3 entierement clos. 4 branches orphelines et verification GitHub Pages restent bloquants humain.
+
+## 2026-05-12 — Sprint 3 J5 — Review (reviewer)
+- Objectif: Valider la sprint review et retrospective Sprint 3
+- Statut: LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: SPRINT_REVIEW.md et RETRO.md complets et cohérents. DoD 3/5 exact, bloquants humain documentés avec commandes précises. RETRO Keep/Improve/Add actionnable, score 23/25 cohérent. LESSONS_LEARNED pattern [promote] bien formé. Sprint 3 entièrement clos.
+
 ## 2026-05-04 — Weekly Strategic Review (manager)
 - Objectif: Revue strategique hebdomadaire — cloture Sprint 2, lancement Sprint 3
 - Statut: Review completee

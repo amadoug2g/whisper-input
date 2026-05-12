@@ -37,6 +37,12 @@ Les entrées marquées `[promote]` sont candidates pour le template `ai-project-
 **Decision/Rule:** Les skip conditions dans les DeploymentTests doivent vérifier l'existence de l'artefact testé spécifiquement, pas du dossier parent.
 **Outcome:** ✅ Corrigé dans `DeploymentTests.swift`.
 
+## Pattern: Fallback SPRINT_CURRENT quand DAILY_GOAL est perime — 2026-05-12 — coder [promote]
+**Context:** Sprint 3 J5 — DAILY_GOAL.md date du 04/05, mais nous sommes le 12/05. L'objectif J1 est deja partiellement bloque humain.
+**Observation:** Quand la date dans DAILY_GOAL.md est anterieure a la date courante, le prochain item non fait est dans SPRINT_CURRENT.md (colonne Statut != Done). Se fier a DAILY_GOAL.md seul conduit a re-tenter un item deja documente comme bloque.
+**Decision/Rule:** Toujours verifier SPRINT_CURRENT.md quand la date de DAILY_GOAL.md < date courante. Identifier le premier item avec Statut "A faire" ou vide — c'est l'objectif reel du jour.
+**Outcome:** Applique — J5 (sprint review + retro) correctement identifie comme item restant et complete.
+
 ## Antipattern: Branches orphelines sans auto-merge — 2026-04-16 — human [promote]
 **Context:** Routines agents qui créent des PRs sans les merger.
 **Observation:** Sans auto-merge dans le reviewer, les branches s'accumulent (6 branches après 2 jours). L'humain doit intervenir pour merger → casse l'autonomie du système.

@@ -6,11 +6,11 @@
 
 ## Definition of Done
 
-- [ ] GitHub Pages confirme fonctionnel (URL live testee, CTA download verifie)
-- [ ] CI : smoke test DMG automatise dans release.yml (hdiutil attach/detach, verification Memo.app)
-- [ ] GitHub Release v1.0 body enrichi avec le contenu de CHANGELOG.md
-- [ ] Branches orphelines supprimees (cleanup remote)
-- [ ] README : screenshots placeholders remplaces ou section retiree
+- [ ] GitHub Pages confirme fonctionnel (URL live testee, CTA download verifie) -- Bloque humain (proxy 403)
+- [x] CI : smoke test DMG automatise dans release.yml (hdiutil attach/detach, verification Memo.app) -- Done J2, PR #21
+- [x] GitHub Release v1.0 body enrichi avec le contenu de CHANGELOG.md -- Done J3, body_path: CHANGELOG.md
+- [ ] Branches orphelines supprimees (cleanup remote) -- Bloque humain (proxy 403)
+- [x] README : screenshots placeholders remplaces ou section retiree -- Done J4, section retiree
 
 ---
 
@@ -18,11 +18,11 @@
 
 | Jour | Objectif | Statut |
 |------|----------|--------|
-| J1 -- 04/05 | GitHub Pages verification + fix si necessaire, cleanup branches orphelines | A faire |
-| J2 -- 05/05 | CI : smoke test DMG automatise (job macos-14 dans release.yml) | A faire |
-| J3 -- 06/05 | Release body : inclure CHANGELOG.md dans release.yml (body_path) | A faire |
-| J4 -- 07/05 | README : screenshots reels ou retrait section placeholder | A faire |
-| J5 -- 08/05 | Sprint review + retro | A faire |
+| J1 -- 04/05 | GitHub Pages verification + fix si necessaire, cleanup branches orphelines | Bloque humain |
+| J2 -- 05/05 | CI : smoke test DMG automatise (job macos-14 dans release.yml) | Done |
+| J3 -- 06/05 | Release body : inclure CHANGELOG.md dans release.yml (body_path) | Done |
+| J4 -- 07/05 | README : screenshots reels ou retrait section placeholder | Done |
+| J5 -- 08/05 | Sprint review + retro | Done |
 
 ---
 
