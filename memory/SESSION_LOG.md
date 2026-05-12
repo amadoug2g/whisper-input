@@ -237,6 +237,12 @@ Format par entrée :
   - PLAN.md et SPRINT_CURRENT.md : J5 marque Done.
   - Sprint 3 entierement clos. 4 branches orphelines et verification GitHub Pages restent bloquants humain.
 
+## 2026-05-12 — Sprint 3 J5 — Review (reviewer)
+- Objectif: Valider la sprint review et retrospective Sprint 3
+- Statut: LGTM
+- Tests: swift non disponible sur Linux — 46 tests inchanges (aucune modification Swift)
+- Notes: SPRINT_REVIEW.md et RETRO.md complets et cohérents. DoD 3/5 exact, bloquants humain documentés avec commandes précises. RETRO Keep/Improve/Add actionnable, score 23/25 cohérent. LESSONS_LEARNED pattern [promote] bien formé. Sprint 3 entièrement clos.
+
 ## 2026-05-04 — Weekly Strategic Review (manager)
 - Objectif: Revue strategique hebdomadaire — cloture Sprint 2, lancement Sprint 3
 - Statut: Review completee
