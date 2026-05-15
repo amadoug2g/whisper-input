@@ -32,8 +32,8 @@ class HotkeyManager {
     private(set) var keyDownAt: Date?
 
     var wasTap: Bool {
-        guard let t = keyDownAt else { return false }
-        return Date().timeIntervalSince(t) < 0.3
+        guard let downAt = keyDownAt else { return false }
+        return Date().timeIntervalSince(downAt) < 0.3
     }
 
     // MARK: - Registration
@@ -86,9 +86,9 @@ class HotkeyManager {
 
 // MARK: - Helper
 
-private func fourCharCode(_ s: String) -> OSType {
+private func fourCharCode(_ str: String) -> OSType {
     var result: OSType = 0
-    for byte in s.utf8.prefix(4) {
+    for byte in str.utf8.prefix(4) {
         result = (result << 8) | OSType(byte)
     }
     return result

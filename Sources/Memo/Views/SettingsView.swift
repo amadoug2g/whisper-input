@@ -72,8 +72,8 @@ struct SettingsView: View {
             // MARK: Recording Mode
             Section {
                 Picker("Mode", selection: $mode) {
-                    ForEach(RecordingMode.allCases, id: \.self) { m in
-                        Text(m.label).tag(m)
+                    ForEach(RecordingMode.allCases, id: \.self) { modeOption in
+                        Text(modeOption.label).tag(modeOption)
                     }
                 }
                 .pickerStyle(.radioGroup)
@@ -268,7 +268,8 @@ struct SettingsView: View {
         Task {
             do {
                 let session = URLSession(configuration: .ephemeral)
-                var request = URLRequest(url: URL(string: "https://api.openai.com/v1/models")!)
+                guard let apiURL = URL(string: "https://api.openai.com/v1/models") else { return }
+                var request = URLRequest(url: apiURL)
                 request.setValue("Bearer \(trimmedKey)", forHTTPHeaderField: "Authorization")
                 request.timeoutInterval = 10
                 let (_, response) = try await session.data(for: request)
@@ -337,17 +338,17 @@ private struct HotkeyRecorderView: View {
     }
 
     private func stopRecording() {
-        if let m = monitor { NSEvent.removeMonitor(m); monitor = nil }
+        if let eventMonitor = monitor { NSEvent.removeMonitor(eventMonitor); monitor = nil }
         isRecording = false
     }
 
     private func carbonModifiers(from flags: NSEvent.ModifierFlags) -> Int {
-        var c = 0
-        if flags.contains(.option)  { c |= 2048 }
-        if flags.contains(.command) { c |= 256  }
-        if flags.contains(.control) { c |= 4096 }
-        if flags.contains(.shift)   { c |= 512  }
-        return c
+        var result = 0
+        if flags.contains(.option)  { result |= 2048 }
+        if flags.contains(.command) { result |= 256  }
+        if flags.contains(.control) { result |= 4096 }
+        if flags.contains(.shift)   { result |= 512  }
+        return result
     }
 
     private func isModifierOnlyKey(_ code: UInt16) -> Bool {
@@ -355,13 +356,13 @@ private struct HotkeyRecorderView: View {
     }
 
     private func displayString(keyCode: Int, modifiers: Int) -> String {
-        var s = ""
-        if modifiers & 4096 != 0 { s += "⌃" }
-        if modifiers & 2048 != 0 { s += "⌥" }
-        if modifiers & 512  != 0 { s += "⇧" }
-        if modifiers & 256  != 0 { s += "⌘" }
-        s += keyName(for: keyCode)
-        return s
+        var display = ""
+        if modifiers & 4096 != 0 { display += "⌃" }
+        if modifiers & 2048 != 0 { display += "⌥" }
+        if modifiers & 512  != 0 { display += "⇧" }
+        if modifiers & 256  != 0 { display += "⌘" }
+        display += keyName(for: keyCode)
+        return display
     }
 
     private func keyName(for code: Int) -> String {

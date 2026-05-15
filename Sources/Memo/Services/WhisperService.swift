@@ -35,6 +35,7 @@ private struct OpenAIErrorResponse: Decodable {
 }
 
 class WhisperService: Transcribing {
+    // swiftlint:disable:next force_unwrapping
     private let endpoint = URL(string: "https://api.openai.com/v1/audio/transcriptions")!
 
     /// Ephemeral session: no disk cache, no persistent credential storage.
@@ -110,7 +111,7 @@ class WhisperService: Transcribing {
 
 private extension Data {
     mutating func append(_ string: String) {
-        if let d = string.data(using: .utf8) { append(d) }
+        if let data = string.data(using: .utf8) { append(data) }
     }
 
     mutating func appendField(name: String, value: String, boundary: String) {
