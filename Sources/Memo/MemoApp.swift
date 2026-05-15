@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import Combine
 
@@ -36,6 +37,7 @@ public struct MemoApp: App {
         MenuBarExtra {
             AppMenuView(
                 toggleRecording: { appDelegate.menuToggleRecording() },
+                openHistory: { appDelegate.openHistory() },
                 menuBarState: appDelegate.menuBarState
             )
         } label: {
@@ -65,8 +67,8 @@ private struct MenuBarLabelView: View {
 private extension RecordingState {
     var menuBarIconName: String {
         switch self {
-        case .idle:         return "mic.circle"
-        case .recording:    return "mic.circle.fill"
+        case .idle:         return "mic.circle.fill"
+        case .recording:    return "mic.fill"
         case .transcribing: return "waveform.circle"
         case .editing:      return "checkmark.circle"
         case .error:        return "exclamationmark.circle"
@@ -86,6 +88,7 @@ private extension RecordingState {
 
 private struct AppMenuView: View {
     let toggleRecording: () -> Void
+    let openHistory: () -> Void
     @ObservedObject var menuBarState: MenuBarState
 
     var body: some View {
@@ -119,6 +122,9 @@ private struct AppMenuView: View {
         }
         .disabled(menuBarState.needsSetup)
         Divider()
+        Button("History…") {
+            openHistory()
+        }
         if #available(macOS 14, *) {
             SettingsLink { Text("Settings…") }
         } else {
