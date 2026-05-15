@@ -72,14 +72,17 @@ class AppState: ObservableObject {
     // Private services — injected for testability
     private let audioRecorder: any AudioRecording
     private let transcriber: any Transcribing
+    let historyStore: any HistoryStoring
     var recordingStartedAt: Date?
 
     init(
         audioRecorder: any AudioRecording = AudioRecorder(),
-        transcriber: any Transcribing = WhisperService()
+        transcriber: any Transcribing = WhisperService(),
+        historyStore: any HistoryStoring = HistoryStore()
     ) {
         self.audioRecorder = audioRecorder
         self.transcriber = transcriber
+        self.historyStore = historyStore
 
         // Load UserDefaults synchronously — fast (< 1ms), needed before first render.
         let prefs = PreferencesStore.loadFast()
@@ -172,6 +175,14 @@ class AppState: ObservableObject {
                 language: selectedLanguage == "auto" ? nil : selectedLanguage
             )
             transcribedText = text
+
+            // Persist to history regardless of auto-paste setting.
+            let entry = TranscriptionEntry(
+                text: text,
+                language: selectedLanguage == "auto" ? nil : selectedLanguage
+            )
+            historyStore.add(entry: entry)
+
             if autoPasteEnabled {
                 confirmAndPaste()
             } else {
