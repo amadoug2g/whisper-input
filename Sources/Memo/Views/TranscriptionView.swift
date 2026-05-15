@@ -25,9 +25,13 @@ struct TranscriptionView: View {
         }
         .opacity(isVisible ? 1 : 0)
         .scaleEffect(isVisible ? 1 : 0.95, anchor: .bottom)
-        .animation(.easeOut(duration: 0.15), value: appState.recordingState)
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: appState.recordingState)
         .onAppear {
-            withAnimation(.easeOut(duration: 0.12)) { isVisible = true }
+            if reduceMotion {
+                isVisible = true
+            } else {
+                withAnimation(.easeOut(duration: 0.12)) { isVisible = true }
+            }
         }
         .onChange(of: appState.recordingState) { state in
             if state == .editing { editorFocused = true }
@@ -56,7 +60,7 @@ struct TranscriptionView: View {
         .background(
             reduceTransparency
                 ? AnyShapeStyle(Color(NSColor.windowBackgroundColor))
-                : AnyShapeStyle(.regularMaterial),
+                : AnyShapeStyle(.ultraThinMaterial),
             in: Capsule()
         )
         .shadow(color: Color.primary.opacity(0.12), radius: 8, y: 3)
@@ -86,7 +90,7 @@ struct TranscriptionView: View {
         .background(
             reduceTransparency
                 ? AnyShapeStyle(Color(NSColor.windowBackgroundColor))
-                : AnyShapeStyle(.regularMaterial),
+                : AnyShapeStyle(.ultraThinMaterial),
             in: RoundedRectangle(cornerRadius: 12)
         )
         .frame(width: 400)
@@ -98,9 +102,9 @@ struct TranscriptionView: View {
     private var editingContent: some View {
         TextEditor(text: $appState.transcribedText)
             .focused($editorFocused)
-            .font(.body)
+            .font(.system(.body, design: .rounded))
             .scrollContentBackground(.hidden)
-            .padding(10)
+            .padding(16)
             .frame(minHeight: 72, maxHeight: 140)
             .accessibilityLabel("Transcription")
             .accessibilityHint("Edit text before pasting into the active application")
@@ -111,12 +115,12 @@ struct TranscriptionView: View {
     private func errorContent(_ message: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 8) {
-                Image(systemName: "exclamationmark.circle.fill")
+                Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundStyle(.red)
-                    .imageScale(.small)
+                    .imageScale(.medium)
                     .accessibilityHidden(true)
                 Text(message)
-                    .font(.callout)
+                    .font(.system(.callout, design: .rounded))
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -125,7 +129,7 @@ struct TranscriptionView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
+        .padding(16)
     }
 
     // MARK: - Footer
@@ -141,8 +145,8 @@ struct TranscriptionView: View {
                 .keyboardShortcut(.return, modifiers: .command)
                 .disabled(appState.transcribedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
     }
 
     // MARK: - Timer helpers
@@ -168,6 +172,7 @@ struct WaveformView: View {
 
     private let barCount = 5
     @State private var phases: [Double]
+    @State private var glowPulse: Bool = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(level: Float) {
@@ -187,7 +192,23 @@ struct WaveformView: View {
             }
         }
         .frame(height: 20)
+        .padding(6)
+        .background(
+            Color.red.opacity(reduceMotion ? 0 : (glowPulse ? 0.18 : 0.06)),
+            in: Capsule()
+        )
+        .shadow(
+            color: Color.red.opacity(reduceMotion ? 0 : (glowPulse ? 0.45 : 0.15)),
+            radius: glowPulse ? 8 : 4
+        )
+        .animation(
+            reduceMotion ? nil : .easeInOut(duration: 0.75).repeatForever(autoreverses: true),
+            value: glowPulse
+        )
         .accessibilityHidden(true)
+        .onAppear {
+            if !reduceMotion { glowPulse = true }
+        }
         .onReceive(timer) { _ in
             if !reduceMotion {
                 for barIndex in 0..<barCount { phases[barIndex] += 0.3 }
