@@ -23,6 +23,10 @@ if [ ! -f "$ICNS" ]; then
   "$REPO/scripts/generate-icon.sh"
 fi
 
-codesign --force --deep --sign - "$APP" 2>/dev/null
+if [ -z "${CI:-}" ]; then
+  codesign --force --deep --sign - "$APP" 2>/dev/null
+else
+  echo "  → Skipping ad-hoc signing in CI (Developer ID signing follows)"
+fi
 
 echo "Memo.app is ready"

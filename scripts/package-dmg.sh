@@ -34,7 +34,11 @@ hdiutil create \
 
 rm -rf "$STAGING_DIR"
 
-echo "→ Signing DMG ad-hoc"
-codesign --force --sign - "$DMG_PATH"
+if [ -z "${CI:-}" ]; then
+  echo "→ Signing DMG ad-hoc"
+  codesign --force --sign - "$DMG_PATH"
+else
+  echo "→ Skipping ad-hoc DMG signing in CI (Developer ID signing follows)"
+fi
 
 echo "Done: $DMG_PATH"
