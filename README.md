@@ -130,7 +130,7 @@ make install  # copier dans /Applications
 make test
 ```
 
-46 tests couvrant la machine d'etats, le cycle enregistrement/transcription/collage, les preferences, le service Whisper et les mocks injectables.
+46 tests couvrant la machine d'etats, le cycle enregistrement/transcription/collage, les preferences, le service Whisper, le deploiement, le panneau flottant et les mocks injectables.
 
 ## Feuille de route
 
