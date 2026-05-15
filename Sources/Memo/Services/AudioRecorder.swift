@@ -30,10 +30,10 @@ enum AudioRecorderError: LocalizedError {
             return "Microphone access denied. Enable it in System Settings › Privacy & Security › Microphone."
         case .alreadyRecording:
             return "A recording is already in progress."
-        case .setupFailed(let e):
-            return "Audio setup failed: \(e.localizedDescription)"
-        case .encodingFailed(let e):
-            let detail = e?.localizedDescription ?? "unknown error"
+        case .setupFailed(let err):
+            return "Audio setup failed: \(err.localizedDescription)"
+        case .encodingFailed(let err):
+            let detail = err?.localizedDescription ?? "unknown error"
             return "Audio encoding failed: \(detail)"
         }
     }

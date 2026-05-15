@@ -35,7 +35,12 @@ private struct OpenAIErrorResponse: Decodable {
 }
 
 class WhisperService: Transcribing {
-    private let endpoint = URL(string: "https://api.openai.com/v1/audio/transcriptions")!
+    private let endpoint: URL = {
+        guard let url = URL(string: "https://api.openai.com/v1/audio/transcriptions") else {
+            preconditionFailure("Invalid hardcoded URL for Whisper API endpoint")
+        }
+        return url
+    }()
 
     /// Ephemeral session: no disk cache, no persistent credential storage.
     private let session: URLSession = {
@@ -110,7 +115,7 @@ class WhisperService: Transcribing {
 
 private extension Data {
     mutating func append(_ string: String) {
-        if let d = string.data(using: .utf8) { append(d) }
+        if let data = string.data(using: .utf8) { append(data) }
     }
 
     mutating func appendField(name: String, value: String, boundary: String) {

@@ -179,18 +179,18 @@ struct WaveformView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 3) {
-            ForEach(0..<barCount, id: \.self) { i in
+            ForEach(0..<barCount, id: \.self) { barIndex in
                 RoundedRectangle(cornerRadius: 1.5)
-                    .fill(Color.red.opacity(barOpacity(for: i)))
-                    .frame(width: 3, height: reduceMotion ? 8 : barHeight(for: i))
-                    .animation(reduceMotion ? nil : .easeInOut(duration: 0.07), value: barHeight(for: i))
+                    .fill(Color.red.opacity(barOpacity(for: barIndex)))
+                    .frame(width: 3, height: reduceMotion ? 8 : barHeight(for: barIndex))
+                    .animation(reduceMotion ? nil : .easeInOut(duration: 0.07), value: barHeight(for: barIndex))
             }
         }
         .frame(height: 20)
         .accessibilityHidden(true)
         .onReceive(timer) { _ in
             if !reduceMotion {
-                for i in 0..<barCount { phases[i] += 0.3 }
+                for barIndex in 0..<barCount { phases[barIndex] += 0.3 }
             }
         }
     }

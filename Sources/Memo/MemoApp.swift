@@ -111,7 +111,7 @@ private struct AppMenuView: View {
             Divider()
         }
 
-        Section(menuBarState.recordingMode.label) {}
+        Section(menuBarState.recordingMode.label) { }
         Divider()
 
         Button(menuBarState.recordingState == .recording ? "Stop Recording" : "Start Recording (⌥ Space)") {
