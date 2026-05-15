@@ -44,8 +44,8 @@ Note le résultat exact (X passed, Y failed).
    - From: branche `feature/...` (lire dans CODER_SUMMARY.md)
    - To: `main`
    - Title: `feat: <description concise>`
-   - Body: résumé + résultat tests + lien sprint goal
-5. **Merge immédiatement la PR** via `mcp__github__merge_pull_request` (méthode `squash`).
+   - Body: inclure `Closes #XX` (numéro d'issue du DAILY_GOAL.md) pour auto-fermeture + résumé + résultat tests
+5. **Merge immédiatement la PR** via `mcp__github__merge_pull_request` (méthode `squash`). L'issue GitHub se ferme automatiquement grâce à `Closes #XX` dans le body.
 6. **Supprime la branche feature** après le merge :
    ```bash
    git checkout main && git pull origin main
