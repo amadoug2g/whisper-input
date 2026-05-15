@@ -61,6 +61,10 @@ jobs:
           echo "→ Available signing identities:"
           security find-identity -v -p codesigning "$KEYCHAIN_PATH"
 
+          SIGNING_IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" | head -1 | awk -F'"' '{print $2}')
+          echo "→ Using identity: $SIGNING_IDENTITY"
+          echo "SIGNING_IDENTITY=$SIGNING_IDENTITY" >> "$GITHUB_ENV"
+
       - name: Build release
         run: swift build -c release
 
@@ -68,11 +72,16 @@ jobs:
         run: bash scripts/package-app.sh
 
       - name: Sign with Developer ID
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
+          echo "→ Unlocking keychain"
+          security unlock-keychain -p "" "$RUNNER_TEMP/build.keychain-db"
+
+          echo "→ Keychains in search list:"
+          security list-keychains -d user
+
           codesign --force --deep --options runtime \
-            --sign "Developer ID Application: Amadougaye Cisse ($APPLE_TEAM_ID)" \
+            --sign "$SIGNING_IDENTITY" \
+            --keychain "$RUNNER_TEMP/build.keychain-db" \
             --entitlements Memo.entitlements \
             Memo.app
 
@@ -107,12 +116,12 @@ jobs:
           bash scripts/package-dmg.sh "$VERSION"
 
       - name: Sign DMG
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
+          security unlock-keychain -p "" "$RUNNER_TEMP/build.keychain-db"
           VERSION="${{ steps.version.outputs.version }}"
           codesign --force \
-            --sign "Developer ID Application: Amadougaye Cisse ($APPLE_TEAM_ID)" \
+            --sign "$SIGNING_IDENTITY" \
+            --keychain "$RUNNER_TEMP/build.keychain-db" \
             "Memo-v${VERSION}.dmg"
 
       - name: Create GitHub Release
