@@ -60,13 +60,17 @@ Réécris `memory/SPRINT_CURRENT.md` avec le nouveau sprint :
 
 Crée `memory/sprints/sprint-NN/PLAN.md` (snapshot J0 du nouveau sprint).
 
-### 5. Commiter et pousser sur main
+### 5. Commiter et pousser via PR
 ```bash
+git checkout main && git pull origin main
+git checkout -b chore/weekly-review-YYYYMMDD
 git add memory/DAILY_GOAL.md memory/SPRINT_CURRENT.md memory/SESSION_LOG.md
 # + memory/sprints/ si sprint changé
 git commit -m "chore: weekly review — Sprint N JX update"
-git push origin main
+git push -u origin chore/weekly-review-YYYYMMDD
 ```
+Crée une PR vers `main` via les outils GitHub MCP, puis merge immédiatement (squash).
+Supprime la branche après merge.
 
 ## Règles de priorisation
 1. Items bloquant la livraison v1.0 (DMG, Release, GitHub Pages) → toujours prioritaires

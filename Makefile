@@ -1,10 +1,13 @@
-.PHONY: dev test app dmg install open clean
+.PHONY: dev test lint app dmg install open clean
 
 dev:
 	swift run MemoMain
 
 test:
 	swift test
+
+lint:
+	swiftlint lint --strict
 
 app:
 	swift build -c release
