@@ -89,6 +89,12 @@ final class PanelController {
         panel.hidesOnDeactivate = false
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.contentView = hostingView
+
+        // Clip the AppKit layer to the SwiftUI-drawn rounded corners.
+        hostingView.wantsLayer = true
+        hostingView.layer?.cornerRadius = 12
+        hostingView.layer?.masksToBounds = true
+
         return panel
     }
 

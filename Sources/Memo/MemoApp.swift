@@ -65,8 +65,8 @@ private struct MenuBarLabelView: View {
 private extension RecordingState {
     var menuBarIconName: String {
         switch self {
-        case .idle:         return "mic.circle"
-        case .recording:    return "mic.circle.fill"
+        case .idle:         return "mic.circle.fill"
+        case .recording:    return "mic.fill"
         case .transcribing: return "waveform.circle"
         case .editing:      return "checkmark.circle"
         case .error:        return "exclamationmark.circle"
