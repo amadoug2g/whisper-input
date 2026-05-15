@@ -35,8 +35,12 @@ private struct OpenAIErrorResponse: Decodable {
 }
 
 class WhisperService: Transcribing {
-    // swiftlint:disable:next force_unwrapping
-    private let endpoint = URL(string: "https://api.openai.com/v1/audio/transcriptions")!
+    private let endpoint: URL = {
+        guard let url = URL(string: "https://api.openai.com/v1/audio/transcriptions") else {
+            preconditionFailure("Invalid hardcoded URL for Whisper API endpoint")
+        }
+        return url
+    }()
 
     /// Ephemeral session: no disk cache, no persistent credential storage.
     private let session: URLSession = {
