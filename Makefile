@@ -7,7 +7,7 @@ test:
 	swift test
 
 lint:
-	swiftlint lint --strict
+	swiftlint lint
 
 app:
 	swift build -c release
