@@ -7,16 +7,16 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version (e.g. 1.0)"
+        description: "Release version (e.g. 1.1)"
         required: true
-        default: "1.0"
+        default: "1.1"
 
 permissions:
   contents: write
 
 jobs:
   build-and-release:
-    name: Build DMG and publish release
+    name: Build, sign, notarize, and publish
     runs-on: macos-14
 
     steps:
@@ -32,16 +32,83 @@ jobs:
             echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Setup test Keychain
+      - name: Import Developer ID certificate
+        env:
+          P12_BASE64: ${{ secrets.DEVELOPER_ID_CERTIFICATE_P12 }}
+          P12_PASSWORD: ${{ secrets.DEVELOPER_ID_CERTIFICATE_PASSWORD }}
         run: |
-          security create-keychain -p "" build.keychain
-          security list-keychains -d user -s build.keychain $(security list-keychains -d user | tr -d '"' | xargs)
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security set-keychain-settings -t 3600 -l build.keychain
+          CERT_PATH="$RUNNER_TEMP/certificate.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain-db"
 
-      - name: Build app and create DMG
-        run: make dmg VERSION=${{ steps.version.outputs.version }}
+          echo "$P12_BASE64" | base64 --decode > "$CERT_PATH"
+
+          security create-keychain -p "" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 3600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "" "$KEYCHAIN_PATH"
+
+          security import "$CERT_PATH" \
+            -k "$KEYCHAIN_PATH" \
+            -P "$P12_PASSWORD" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/productsign
+
+          security set-key-partition-list -S apple-tool:,apple: -k "" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"' | xargs)
+          security default-keychain -s "$KEYCHAIN_PATH"
+
+      - name: Build release
+        run: swift build -c release
+
+      - name: Package app bundle
+        run: bash scripts/package-app.sh
+
+      - name: Sign with Developer ID
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          codesign --force --deep --options runtime \
+            --sign "Developer ID Application: Amadougaye Cisse ($APPLE_TEAM_ID)" \
+            --entitlements Memo.entitlements \
+            Memo.app
+
+          echo "→ Verifying signature"
+          codesign --verify --verbose Memo.app
+          spctl --assess --type execute --verbose Memo.app || true
+
+      - name: Notarize app
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          echo "→ Creating zip for notarization"
+          ditto -c -k --keepParent Memo.app Memo-notarize.zip
+
+          echo "→ Submitting to Apple notarization service"
+          xcrun notarytool submit Memo-notarize.zip \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+
+          echo "→ Stapling notarization ticket"
+          xcrun stapler staple Memo.app
+
+          rm Memo-notarize.zip
+
+      - name: Create DMG
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          bash scripts/package-dmg.sh "$VERSION"
+
+      - name: Sign DMG
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          codesign --force \
+            --sign "Developer ID Application: Amadougaye Cisse ($APPLE_TEAM_ID)" \
+            "Memo-v${VERSION}.dmg"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
@@ -102,7 +169,10 @@ jobs:
           echo "→ Checking code signature"
           codesign --verify --verbose "$MOUNT_POINT/Memo.app"
 
+          echo "→ Checking notarization"
+          spctl --assess --type execute --verbose "$MOUNT_POINT/Memo.app"
+
           echo "→ Detaching DMG"
           hdiutil detach "$MOUNT_POINT" -quiet
 
-          echo "Smoke test passed: Memo.app found and signature verified"
+          echo "Smoke test passed: signed, notarized, and verified"
