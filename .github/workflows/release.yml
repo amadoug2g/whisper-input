@@ -171,7 +171,7 @@ jobs:
 
           echo "→ Attaching $DMG"
           MOUNT_OUTPUT=$(hdiutil attach "$DMG" -nobrowse -noautoopen)
-          MOUNT_POINT=$(echo "$MOUNT_OUTPUT" | grep -E '/Volumes/' | tail -1 | awk '{print $NF}')
+          MOUNT_POINT=$(echo "$MOUNT_OUTPUT" | grep -oE '/Volumes/.*' | tail -1 | sed 's/[[:space:]]*$//')
 
           echo "→ Mounted at: $MOUNT_POINT"
           ls -la "$MOUNT_POINT"
